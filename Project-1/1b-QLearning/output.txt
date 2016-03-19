@@ -1,0 +1,63 @@
+Radial Basis
+Russell World with Radial Basis (sampled at 12 locations):
+>>><
+^>><
+^<<<
+
+
+World with goal in top right corner from the exercise:
+>>>>>>>>>v
+>>>>>>>>^^
+>>>>>>>^^^
+>>>>>>^^^^
+>>>>>^^^^^
+>>>>>^^^^^
+^>>>^^^^^^
+^^^^^^^^^^
+^^^^^^^^^^
+^^^^^^^^^^
+
+World with goal in middle from the exercise:
+vvvvvvvv<<
+>vvvvvv<<<
+>>vvvv<<<<
+>>>vv<<<<<
+>>>><<<<<<
+>>>>^^<<<<
+>>>^^^^<<<
+>>^^^^^^<<
+>^^^^^^^^<
+^^^^^^^^^^
+
+
+Tilings
+Russell world with a single tiling (that matches the dimensions of the problem):
+>>>v
+^^^v
+^>^<
+
+World with goal in top right corner from the exercise:
+>>>>>>>>>v
+^>^^>^>>>^
+v>>^^>^>^^
+>^>^^>^>^^
+>^vv>>>>^^
+>^^v<>>>>^
+^>v>>^^>>^
+v>^><^>^>^
+>^v^^^>^^^
+><>^<>>>>^
+
+Eww.
+
+World with goal in the middle from the exercise:
+vvvvvvvv<v
+vvvvv<<vvv
+>>v>vv<vv<
+v>>v<<<vv<
+>>>>><<<<<
+>^^^>^<<^^
+>^^>^^^<^^
+^>^^^^^<<^
+^>^^>^<<^<
+^>^<^^^^<<
