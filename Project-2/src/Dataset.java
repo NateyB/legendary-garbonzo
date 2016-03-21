@@ -9,9 +9,9 @@ import java.util.Scanner;
 // TODO Generalize this class to work better with any domain, rather than this one alone (or create an interface)
 public class Dataset
 {
-    private INode [] network;
+    private INode[] network;
 
-    public INode [] getNetwork()
+    public INode[] getNetwork()
     {
         return network.clone();
     }
@@ -30,43 +30,46 @@ public class Dataset
         while (parser.hasNext())
         {
             int id = parser.nextInt();
-            ArrayList<Integer> parents = new ArrayList<>();
+            ArrayList<Integer> parentList = new ArrayList<>();
 
             while (parser.hasNextInt())
             {
-                parents.add(parser.nextInt());
+                parentList.add(parser.nextInt());
             }
 
-            BayesianNode current = new BayesianNode(id, new String [] {"T", "F"});
-            INode[] actualParents = new INode[parents.size()];
-            for (int i = 0; i < parents.size(); i++)
+            BayesianNode current = new BayesianNode(id, new String[]{"T", "F"});
+            INode[] parents = new INode[parentList.size()];
+            for (int i = 0; i < parentList.size(); i++)
             {
-                actualParents[i] = network.get(parents.get(i));
+                parents[i] = network.get(parentList.get(i));
             }
-            current.setParents(actualParents);
-            if (parents.size() > 0)
+            current.setParents(parents);
+            if (parents.length > 0)
             {
                 ArrayList<Double[]> distribution = new ArrayList<>();
-                for (int parent : parents)
+                int totalValues = 1;
+                for (INode parent : parents)
                 {
-                    for (int i = 0; i < network.get(parent).getDomain().length; i++)
-                    {
-                        for (int j = 0; j < parents.size(); j++)
-                        {
-                            if (!parser.hasNext())
-                            {
-                                System.err.println("Couldn't find parent's value in file!");
-                            } else
-                            {
-                                parser.next();
-                            }
-                        }
-                        double prob = parser.nextDouble();
-                        distribution.add(new Double [] {prob, 1 - prob});
-                    }
+                    totalValues *= parent.getDomain().length;
                 }
 
-                double [][] newDistribution = new double[distribution.size()][2];
+                for (int j = 0; j < totalValues; j++)
+                {
+                    for (int i = 0; i < parents.length; i++)
+                    {
+                        if (!parser.hasNext())
+                        {
+                            System.err.println("Couldn't find parent's value in file!");
+                        } else
+                        {
+                            parser.next();
+                        }
+                    }
+
+                    double prob = parser.nextDouble();
+                    distribution.add(new Double[]{prob, 1 - prob});
+                }
+                double[][] newDistribution = new double[distribution.size()][2];
                 for (int i = 0; i < distribution.size(); i++)
                 {
                     for (int j = 0; j < distribution.get(i).length; j++)
@@ -79,12 +82,12 @@ public class Dataset
             } else
             {
                 double probability = parser.nextDouble();
-                current.setLookup(new double [][] {{probability, 1 - probability}});
+                current.setLookup(new double[][]{{probability, 1 - probability}});
             }
             network.add(current);
 
         }
-        INode [] newNetwork = new INode [network.size()];
+        INode[] newNetwork = new INode[network.size()];
         this.network = network.toArray(newNetwork);
     }
 }
