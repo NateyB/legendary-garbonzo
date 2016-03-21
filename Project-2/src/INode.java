@@ -18,9 +18,14 @@ public interface INode
     void setValue(String value);
 
     /**
-     * @param parents The nodes which function as parent nodes to the entity
+     * @param parents The nodes which function as parent nodes to the entity; returned by getParents().
      */
     void setParents(INode [] parents);
+
+    /**
+     * @return The parents of the node
+     */
+    INode [] getParents();
 
     /**
      * @return An array of strings that contain the discrete values which this node can take (in a boolean project,

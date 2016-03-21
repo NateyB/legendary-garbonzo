@@ -1,7 +1,12 @@
 -- MDP is a set of states, actions in those states (here actions are static), a transition model,
 -- and a reward. Note that our transition model must also take in coordinates.
 -- As a final point of note, the MDP must also pass an accessor so that the coordinates can be used.
-data MDP state action stateComponent = MDP state [action] (state -> [Int] -> stateComponent) (state -> [Int] -> [[[Double]]] -> [Double]) (state -> action -> [Int] -> [Double]) (stateComponent -> Double)
+data NDimensionalGrid numType = Nil
+                                | OneDimensionalGrid [numType]
+                                | NDimensionalGrid [NDimensionalGrid numType]
+                                deriving (Show, Eq)
+
+data MDP stateComponent action = MDP (NDimensionalGrid stateComponent) (NDimensionalGrid stateComponent -> action) (NDimensionalGrid stateComponent -> [Int] -> stateComponent) ((NDimensionalGrid stateComponent) -> [Int] -> (NDimensionalGrid Double) -> [Double]) (state -> action -> [Int] -> [Double]) (stateComponent -> Double)
 
 
 --------------------------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@ import java.util.Scanner;
 /**
  * Created for BayesianNetworks by @author Nate Beckemeyer on 2016-03-20.
  * <p>
- * This is the class that runs the Bayesian Network analysis
+ * This is the class that runs the Bayesian Network analysis.
  */
 
 public class Runner
@@ -54,7 +54,6 @@ public class Runner
             while (true)
             {
                 System.out.print("Please enter the id of the node that you wish to query (or anything else to continue): ");
-                // TODO These networks aren't resetting properly after a query; therefore, only one variable can be appropriately queried per run. (Apparently restricted to the approximate algorithms).
                 if (!console.hasNextInt())
                 {
                     console.next();
@@ -66,7 +65,7 @@ public class Runner
                 double[] likeOutput = likeWeight.query(likeNetwork[id], likeNetwork);
                 double[] gibbsOutput = gibbsSample.query(gibbsNetwork[id], gibbsNetwork);
 
-                System.out.printf("Enumeration Ask: T: %f; F: %f%nLikelihood Weighting (%d samples): T: %f; F: %f%nGibbs' Sampling (%d samples): T: %f; F: %f%n%n",
+                System.out.printf("%nEnumeration Ask: T: %f; F: %f%nLikelihood Weighting (%d samples): T: %f; F: %f%nGibbs' Sampling (%d samples): T: %f; F: %f%n%n",
                         enumOutput[0], enumOutput[1], numSamples, likeOutput[0], likeOutput[1], numSamples, gibbsOutput[0], gibbsOutput[1]);
             }
         }

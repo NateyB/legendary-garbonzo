@@ -7,7 +7,6 @@ import java.util.Scanner;
  * Created for BayesianNetworks by @author Nate Beckemeyer on 2016-03-19.
  */
 // TODO Generalize this class to work better with any domain, rather than this one alone (or create an interface)
-// TODO Verify that this entire class functions properly
 public class Dataset
 {
     private INode [] network;

@@ -53,7 +53,7 @@ public class BayesianNode implements INode
         int index = 0;
         for (int i = 0; i < parents.length; i++)
         {
-            index += (parents[i].getValue().equals("F") ? Math.pow(2,i) : 0); // TODO Fix this to work with any discrete domains
+            index += (parents[i].getValue().equals("F") ? Math.pow(2,i) : 0); // TODO Fix this to work with any discrete domains (eventually)
         }
 
         return lookupTable[index];

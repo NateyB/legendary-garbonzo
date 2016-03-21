@@ -4,6 +4,8 @@ import java.util.Random;
 
 /**
  * Created for BayesianNetworks by @author Nate Beckemeyer on 2016-03-21.
+ *
+ * Note that this is equivalent to the Monte-Carlo Markov Chain Ask as presented in the slides.
  */
 public class GibbsSampling implements IInferenceAlgorithm
 {
@@ -26,6 +28,31 @@ public class GibbsSampling implements IInferenceAlgorithm
         return dist;
     }
 
+    private int properIndexOfValue(INode node)
+    {
+        return Arrays.asList(node.getDomain()).indexOf(node.getValue());
+    }
+
+    private double markovBlanketProbability(INode node, INode [] network)
+    {
+        double probability = node.getDistribution()[properIndexOfValue(node)];
+        ArrayList<INode> children = new ArrayList<>();
+
+        for (int i = 0; i < network.length; i++)
+        {
+            if (Arrays.asList(network[i].getParents()).contains(node))
+            {
+                children.add(network[i]);
+            }
+        }
+        for (INode child: children)
+        {
+            probability *= child.getDistribution()[properIndexOfValue(child)];
+        }
+
+        return probability;
+    }
+
     /**
      * @param query   The node that's being queried
      * @param network The array of nodes that form the Bayesian network
@@ -38,6 +65,7 @@ public class GibbsSampling implements IInferenceAlgorithm
         for (int i = 0; i < network.length; i++)
         {
             evidence[i] = network[i].getValue() != null;
+            network[i].setValue(network[i].getValue() != null ? network[i].getValue() : network[i].getDomain()[pickRandom(network[i].getDistribution())]);
         }
 
 
@@ -47,8 +75,15 @@ public class GibbsSampling implements IInferenceAlgorithm
             {
                 if (!evidence[current])
                 {
-                    network[current].setValue(network[current].getDomain()[pickRandom(network[current].getDistribution())]); // TODO use whole Markov blanket
-                    counts[Arrays.asList(network[current].getDomain()).indexOf(network[current].getValue())] += 1;
+                    double [] distribution = new double[query.getDomain().length];
+                    for (int i = 0; i < query.getDomain().length; i++)
+                    {
+                        // Calculating the markov blanket probability for each value of the node
+                        network[current].setValue(query.getDomain()[i]);
+                        distribution[i] = markovBlanketProbability(network[current], network);
+                    }
+                    network[current].setValue(network[current].getDomain()[pickRandom(normalize(distribution))]);
+                    counts[properIndexOfValue(query)] += 1;
                 }
             }
         }
@@ -82,7 +117,7 @@ public class GibbsSampling implements IInferenceAlgorithm
             }
         }
 
-        return -1;
+        return -2;
     }
 
     public GibbsSampling(int numSamples)
