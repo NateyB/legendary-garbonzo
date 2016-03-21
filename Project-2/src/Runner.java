@@ -10,8 +10,13 @@ public class Runner
 {
     public static void main(String[] args)
     {
-        GibbsSampling main = new GibbsSampling(10000);
+        int numSamples = 10000;
+        EnumerationAsk enumAsk = new EnumerationAsk();
+        LikelihoodWeighting likeWeight = new LikelihoodWeighting(numSamples);
+        GibbsSampling gibbsSample = new GibbsSampling(numSamples);
         Scanner console = new Scanner(System.in);
+
+
         String read = "";
         while (true)
         {
@@ -21,8 +26,12 @@ public class Runner
             {
                 return;
             }
-            Dataset current = new Dataset(read, main);
-            INode[] network = current.getNetwork();
+            Dataset enumData = new Dataset(read);
+            Dataset likeData = new Dataset(read);
+            Dataset gibbsData = new Dataset(read);
+            INode[] enumNetwork = enumData.getNetwork();
+            INode[] likeNetwork = likeData.getNetwork();
+            INode[] gibbsNetwork = gibbsData.getNetwork();
 
 
             while (true)
@@ -35,20 +44,30 @@ public class Runner
                 }
                 int id = console.nextInt();
                 System.out.printf("Please enter the value you wish to set node %d: ", id);
-                network[id].setValue(console.next());
+
+                String val = console.next();
+                enumNetwork[id].setValue(val);
+                likeNetwork[id].setValue(val);
+                gibbsNetwork[id].setValue(val);
             }
 
             while (true)
             {
                 System.out.print("Please enter the id of the node that you wish to query (or anything else to continue): ");
+                // TODO These networks aren't resetting properly after a query; therefore, only one variable can be appropriately queried per run. (Apparently restricted to the approximate algorithms).
                 if (!console.hasNextInt())
                 {
                     console.next();
                     break;
                 }
+
                 int id = console.nextInt();
-                double[] output = main.query(network[id], network);
-                System.out.printf("%nT: %f; F: %f%n", output[0], output[1]);
+                double[] enumOutput = enumAsk.query(enumNetwork[id], enumNetwork);
+                double[] likeOutput = likeWeight.query(likeNetwork[id], likeNetwork);
+                double[] gibbsOutput = gibbsSample.query(gibbsNetwork[id], gibbsNetwork);
+
+                System.out.printf("Enumeration Ask: T: %f; F: %f%nLikelihood Weighting (%d samples): T: %f; F: %f%nGibbs' Sampling (%d samples): T: %f; F: %f%n%n",
+                        enumOutput[0], enumOutput[1], numSamples, likeOutput[0], likeOutput[1], numSamples, gibbsOutput[0], gibbsOutput[1]);
             }
         }
 

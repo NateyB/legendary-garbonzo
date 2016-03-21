@@ -11,22 +11,15 @@ import java.util.Scanner;
 public class Dataset
 {
     private INode [] network;
-    private IInferenceAlgorithm algorithm;
-
-    public IInferenceAlgorithm getAlgorithm()
-    {
-        return algorithm;
-    }
 
     public INode [] getNetwork()
     {
         return network.clone();
     }
 
-    public Dataset(String filePath, IInferenceAlgorithm algorithm)
+    public Dataset(String filePath)
     {
         ArrayList<INode> network = new ArrayList<>();
-        this.algorithm = algorithm;
         Scanner parser = null;
         try
         {

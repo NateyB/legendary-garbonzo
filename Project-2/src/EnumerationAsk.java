@@ -35,6 +35,11 @@ public class EnumerationAsk implements IInferenceAlgorithm
     @Override public double[] query(INode query, INode[] network)
     {
         double[] distribution = new double[query.getDomain().length];
+        if (query.getValue() != null)
+        {
+            distribution[Arrays.asList(query.getDomain()).indexOf(query.getValue())] = 1;
+            return distribution;
+        }
         for (int i = 0; i < distribution.length; i++)
         {
             query.setValue(query.getDomain()[i]);

@@ -53,6 +53,14 @@ public class GibbsSampling implements IInferenceAlgorithm
             }
         }
 
+        for (int i = 0; i < evidence.length; i++)
+        {
+            if (!evidence[i])
+            {
+                network[i].setValue(null);
+            }
+        }
+
         return normalize(counts);
     }
 
