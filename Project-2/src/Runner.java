@@ -10,7 +10,7 @@ public class Runner
 {
     public static void main(String[] args)
     {
-        EnumerationAsk main = new EnumerationAsk();
+        LikelihoodWeighting main = new LikelihoodWeighting(10000);
         Scanner console = new Scanner(System.in);
         String read = "";
         while (true)
