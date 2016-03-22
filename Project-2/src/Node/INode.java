@@ -1,4 +1,4 @@
-import java.util.Collection;
+package Node;
 
 /**
  * Created for BayesianNetworks by @author Nate Beckemeyer on 2016-03-19.

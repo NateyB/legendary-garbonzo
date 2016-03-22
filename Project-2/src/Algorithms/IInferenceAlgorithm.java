@@ -1,3 +1,7 @@
+package Algorithms;
+
+import Node.INode;
+
 /**
  * Created for BayesianNetworks by @author Nate Beckemeyer on 2016-03-20.
  */

@@ -1,3 +1,7 @@
+package Algorithms;
+
+import Node.INode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -28,11 +32,22 @@ public class GibbsSampling implements IInferenceAlgorithm
         return dist;
     }
 
+    /**
+     * @param node
+     * @return The index of the node's value in the array of the node's domain.
+     */
     private int properIndexOfValue(INode node)
     {
         return Arrays.asList(node.getDomain()).indexOf(node.getValue());
     }
 
+    /**
+     * Returns the probability that a node's value is what it's been (temporarily) assigned to be, given its Markov blanket.
+     *
+     * @param node The node to be tested
+     * @param network The Bayesian network (from which the blanket is deduced)
+     * @return The probability that node's value is what it's been assigned to be given its Markov blanket.
+     */
     private double markovBlanketProbability(INode node, INode [] network)
     {
         double probability = node.getDistribution()[properIndexOfValue(node)];
@@ -40,7 +55,7 @@ public class GibbsSampling implements IInferenceAlgorithm
 
         for (int i = 0; i < network.length; i++)
         {
-            if (Arrays.asList(network[i].getParents()).contains(node))
+            if (Arrays.asList(network[i].getParents()).contains(node)) //TODO This is horrifyingly ugly. I give myself permission to update INode to avoid this methodology, in the future.
             {
                 children.add(network[i]);
             }
@@ -99,7 +114,12 @@ public class GibbsSampling implements IInferenceAlgorithm
         return normalize(counts);
     }
 
-
+    /**
+     * Picks a random index of the probability distribution, proportional to their probabilities.
+     *
+     * @param distribution The probability distribution needing an item selected
+     * @return An integer indicating which item in the probability distribution was chosen
+     */
     private int pickRandom(double [] distribution)
     {
         double runningSum[] = new double[distribution.length];

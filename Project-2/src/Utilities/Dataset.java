@@ -1,3 +1,8 @@
+package Utilities;
+
+import Node.BayesianNode;
+import Node.INode;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -29,7 +34,6 @@ public class Dataset
         }
         while (parser.hasNext())
         {
-            int id = parser.nextInt();
             ArrayList<Integer> parentList = new ArrayList<>();
 
             while (parser.hasNextInt())
@@ -37,7 +41,7 @@ public class Dataset
                 parentList.add(parser.nextInt());
             }
 
-            BayesianNode current = new BayesianNode(id, new String[]{"T", "F"});
+            BayesianNode current = new BayesianNode(new String[]{"T", "F"});
             INode[] parents = new INode[parentList.size()];
             for (int i = 0; i < parentList.size(); i++)
             {

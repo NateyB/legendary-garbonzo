@@ -1,3 +1,9 @@
+import Algorithms.EnumerationAsk;
+import Algorithms.GibbsSampling;
+import Algorithms.LikelihoodWeighting;
+import Node.INode;
+import Utilities.Dataset;
+
 import java.util.Scanner;
 
 /**
@@ -6,7 +12,7 @@ import java.util.Scanner;
  * This is the class that runs the Bayesian Network analysis.
  */
 
-public class Runner
+public class Control
 {
     public static void main(String[] args)
     {
@@ -61,12 +67,16 @@ public class Runner
                 }
 
                 int id = console.nextInt();
-                double[] enumOutput = enumAsk.query(enumNetwork[id], enumNetwork);
-                double[] likeOutput = likeWeight.query(likeNetwork[id], likeNetwork);
-                double[] gibbsOutput = gibbsSample.query(gibbsNetwork[id], gibbsNetwork);
+                long time = System.currentTimeMillis();
 
-                System.out.printf("%nEnumeration Ask: T: %f; F: %f%nLikelihood Weighting (%d samples): T: %f; F: %f%nGibbs' Sampling (%d samples): T: %f; F: %f%n%n",
-                        enumOutput[0], enumOutput[1], numSamples, likeOutput[0], likeOutput[1], numSamples, gibbsOutput[0], gibbsOutput[1]);
+                double[] likeOutput = likeWeight.query(likeNetwork[id], likeNetwork);
+                System.out.printf("%nLikelihood Weighting: T: %f F: %f; Time taken: %d", likeOutput[0], likeOutput[1], -time + (time = System.currentTimeMillis()));
+
+                double[] gibbsOutput = gibbsSample.query(gibbsNetwork[id], gibbsNetwork);
+                System.out.printf("%nGibbs Sampling: T: %f F: %f; Time taken: %d", gibbsOutput[0], gibbsOutput[1], -time + (time = System.currentTimeMillis()));
+
+                double[] enumOutput = enumAsk.query(enumNetwork[id], enumNetwork);
+                System.out.printf("%nEnumeration Ask: T: %f F: %f; Time taken: %d%n%n", enumOutput[0], enumOutput[1], -time + System.currentTimeMillis());
             }
         }
 

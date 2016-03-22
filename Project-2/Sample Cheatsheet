@@ -1,0 +1,7 @@
+Sample 0: Burglary, Earthquake, Alarm, Mary calls, John calls examples
+Sample 1: Utilities.Dataset I sent in the e-mail (12-node polytree, parentless node ratio .3)
+Sample 2: 20-node polytree, parentless node ratio: .3
+Sample 3: Cloudy, Sprinker, Rain, Grass
+Sample 4: 150 node not polytree with a 10-parent node
+Sample 5: 50 nodes, 40 of which are parentless; polytree
+Sample 6: 150 nodes, 12 parent max, not a polytree

@@ -1,11 +1,10 @@
+package Node;
+
 /**
  * Created for BayesianNetworks by @author Nate Beckemeyer on 2016-03-20.
  */
 public class BayesianNode implements INode
 {
-    private Dataset dataset;
-
-    private int id;
     private String value;
     private double [][] lookupTable;
     private String[] domain;
@@ -68,9 +67,8 @@ public class BayesianNode implements INode
         this.lookupTable = distribution;
     }
 
-    public BayesianNode(int id, String[] domain)
+    public BayesianNode(String[] domain)
     {
-        this.id = id;
         this.domain = domain;
     }
 }
