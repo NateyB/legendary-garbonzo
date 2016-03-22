@@ -1,6 +1,6 @@
-package Algorithms;
+package com.natebeckemeyer.school.advai.project2.algorithms;
 
-import Node.INode;
+import com.natebeckemeyer.school.advai.project2.nodes.INode;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * Created for BayesianNetworks by @author Nate Beckemeyer on 2016-03-21.
  *
- * The Likelihood Weighting algorithm for approximate inference in Bayesian networks
+ * The Likelihood Weighting algorithms for approximate inference in Bayesian networks
  */
 public class LikelihoodWeighting implements IInferenceAlgorithm
 {
@@ -39,7 +39,7 @@ public class LikelihoodWeighting implements IInferenceAlgorithm
     }
 
     /**
-     * @param query   The node that's being queried
+     * @param query   The nodes that's being queried
      * @param network The array of nodes that form the Bayesian network
      * @return The probability distribution over the query variable, given the evidence and network
      */

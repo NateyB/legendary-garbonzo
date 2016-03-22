@@ -1,7 +1,7 @@
-package Utilities;
+package com.natebeckemeyer.school.advai.project2.utilities;
 
-import Node.BayesianNode;
-import Node.INode;
+import com.natebeckemeyer.school.advai.project2.nodes.BayesianNode;
+import com.natebeckemeyer.school.advai.project2.nodes.INode;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,6 +47,7 @@ public class Dataset
             for (int i = 0; i < parentList.size(); i++)
             {
                 parents[i] = network.get(parentList.get(i));
+                network.get(parentList.get(i)).addChild(current);
             }
             current.setParents(parents);
             if (parents.length > 0)

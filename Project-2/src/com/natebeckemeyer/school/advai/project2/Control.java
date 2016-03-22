@@ -1,8 +1,10 @@
-import Algorithms.EnumerationAsk;
-import Algorithms.GibbsSampling;
-import Algorithms.LikelihoodWeighting;
-import Node.INode;
-import Utilities.Dataset;
+package com.natebeckemeyer.school.advai.project2;
+
+import com.natebeckemeyer.school.advai.project2.algorithms.EnumerationAsk;
+import com.natebeckemeyer.school.advai.project2.algorithms.GibbsSampling;
+import com.natebeckemeyer.school.advai.project2.algorithms.LikelihoodWeighting;
+import com.natebeckemeyer.school.advai.project2.nodes.INode;
+import com.natebeckemeyer.school.advai.project2.utilities.Dataset;
 
 import java.util.Scanner;
 
@@ -16,19 +18,23 @@ public class Control
 {
     public static void main(String[] args)
     {
+        int maximumSizeForExactInference = 30;
         int numSamples = 10000;
+
+
+
         EnumerationAsk enumAsk = new EnumerationAsk();
-        LikelihoodWeighting likeWeight = new LikelihoodWeighting(20*numSamples);
+        LikelihoodWeighting likeWeight = new LikelihoodWeighting(numSamples);
         GibbsSampling gibbsSample = new GibbsSampling(numSamples);
         Scanner console = new Scanner(System.in);
 
 
-        String read = "";
+        String read;
         while (true)
         {
             System.out.print("Please enter the file name (or stop or quit to exit): ");
             read = console.next();
-            if (read.equals("stop") || read.equals("quit"))
+            if (read.equals("stop") || read.equals("quit") || read.equals("exit"))
             {
                 return;
             }
@@ -42,14 +48,14 @@ public class Control
 
             while (true)
             {
-                System.out.print("Please enter the id of the node that you wish to change (or anything else to continue): ");
+                System.out.print("Please enter the id of the nodes that you wish to change (or anything else to continue): ");
                 if (!console.hasNextInt())
                 {
                     console.next();
                     break;
                 }
                 int id = console.nextInt();
-                System.out.printf("Please enter the value you wish to set node %d: ", id);
+                System.out.printf("Please enter the value you wish to set nodes %d: ", id);
 
                 String val = console.next();
                 enumNetwork[id].setValue(val);
@@ -59,7 +65,7 @@ public class Control
 
             while (true)
             {
-                System.out.print("Please enter the id of the node that you wish to query (or anything else to continue): ");
+                System.out.print("Please enter the id of the nodes that you wish to query (or anything else to continue): ");
                 if (!console.hasNextInt())
                 {
                     console.next();
@@ -75,8 +81,14 @@ public class Control
                 double[] gibbsOutput = gibbsSample.query(gibbsNetwork[id], gibbsNetwork);
                 System.out.printf("%nGibbs Sampling: T: %f F: %f; Time taken: %d", gibbsOutput[0], gibbsOutput[1], -time + (time = System.currentTimeMillis()));
 
-//                double[] enumOutput = enumAsk.query(enumNetwork[id], enumNetwork);
-//                System.out.printf("%nEnumeration Ask: T: %f F: %f; Time taken: %d", enumOutput[0], enumOutput[1], -time + System.currentTimeMillis());
+                if (enumNetwork.length <= maximumSizeForExactInference)
+                {
+                    double[] enumOutput = enumAsk.query(enumNetwork[id], enumNetwork);
+                    System.out.printf("%nEnumeration Ask: T: %f F: %f; Time taken: %d", enumOutput[0], enumOutput[1], -time + System.currentTimeMillis());
+                } else
+                {
+                    System.out.printf("%nUnfortunately, because the nodes has more than %d nodes, Enumeration Ask is intractable.", maximumSizeForExactInference);
+                }
 
                 System.out.printf("%n%n");
             }

@@ -1,8 +1,7 @@
-package Algorithms;
+package com.natebeckemeyer.school.advai.project2.algorithms;
 
-import Node.INode;
+import com.natebeckemeyer.school.advai.project2.nodes.INode;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -33,8 +32,8 @@ public class GibbsSampling implements IInferenceAlgorithm
     }
 
     /**
-     * @param node
-     * @return The index of the node's value in the array of the node's domain.
+     * @param node The node whose value needs a corresponding index
+     * @return The index of the node's current value in the array of the node's domain.
      */
     private int properIndexOfValue(INode node)
     {
@@ -45,21 +44,13 @@ public class GibbsSampling implements IInferenceAlgorithm
      * Returns the probability that a node's value is what it's been (temporarily) assigned to be, given its Markov blanket.
      *
      * @param node The node to be tested
-     * @param network The Bayesian network (from which the blanket is deduced)
      * @return The probability that node's value is what it's been assigned to be given its Markov blanket.
      */
-    private double markovBlanketProbability(INode node, INode [] network)
+    private double markovBlanketProbability(INode node)
     {
         double probability = node.getDistribution()[properIndexOfValue(node)];
-        ArrayList<INode> children = new ArrayList<>();
+        INode [] children = node.getChildren();
 
-        for (int i = 0; i < network.length; i++)
-        {
-            if (Arrays.asList(network[i].getParents()).contains(node)) //TODO This is horrifyingly ugly. I give myself permission to update INode to avoid this methodology, in the future.
-            {
-                children.add(network[i]);
-            }
-        }
         for (INode child: children)
         {
             probability *= child.getDistribution()[properIndexOfValue(child)];
@@ -95,7 +86,7 @@ public class GibbsSampling implements IInferenceAlgorithm
                     {
                         // Calculating the markov blanket probability for each value of the node
                         network[current].setValue(query.getDomain()[i]);
-                        distribution[i] = markovBlanketProbability(network[current], network);
+                        distribution[i] = markovBlanketProbability(network[current]);
                     }
                     network[current].setValue(network[current].getDomain()[pickRandom(normalize(distribution))]);
                     counts[properIndexOfValue(query)] += 1;

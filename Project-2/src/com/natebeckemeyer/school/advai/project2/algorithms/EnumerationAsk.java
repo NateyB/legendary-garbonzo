@@ -1,6 +1,6 @@
-package Algorithms;
+package com.natebeckemeyer.school.advai.project2.algorithms;
 
-import Node.INode;
+import com.natebeckemeyer.school.advai.project2.nodes.INode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +32,7 @@ public class EnumerationAsk implements IInferenceAlgorithm
     /**
      * Enumeration ask, as seen in the textbook (Russell & Norvig, 3rd Edition)
      *
-     * @param query   The node that's being queried
+     * @param query   The nodes that's being queried
      * @param network The array of nodes that form the Bayesian network
      * @return The probability distribution over the query variable, given the evidence and network
      */
@@ -55,7 +55,7 @@ public class EnumerationAsk implements IInferenceAlgorithm
     }
 
     /**
-     * The enumerateAll component of the enumeration-ask algorithm
+     * The enumerateAll component of the enumeration-ask algorithms
      *
      * @param vars The list of variables still being considered
      * @return The probability of those variables having their value
