@@ -18,7 +18,7 @@ public class Control
     {
         int numSamples = 10000;
         EnumerationAsk enumAsk = new EnumerationAsk();
-        LikelihoodWeighting likeWeight = new LikelihoodWeighting(numSamples);
+        LikelihoodWeighting likeWeight = new LikelihoodWeighting(20*numSamples);
         GibbsSampling gibbsSample = new GibbsSampling(numSamples);
         Scanner console = new Scanner(System.in);
 
@@ -75,8 +75,10 @@ public class Control
                 double[] gibbsOutput = gibbsSample.query(gibbsNetwork[id], gibbsNetwork);
                 System.out.printf("%nGibbs Sampling: T: %f F: %f; Time taken: %d", gibbsOutput[0], gibbsOutput[1], -time + (time = System.currentTimeMillis()));
 
-                double[] enumOutput = enumAsk.query(enumNetwork[id], enumNetwork);
-                System.out.printf("%nEnumeration Ask: T: %f F: %f; Time taken: %d%n%n", enumOutput[0], enumOutput[1], -time + System.currentTimeMillis());
+//                double[] enumOutput = enumAsk.query(enumNetwork[id], enumNetwork);
+//                System.out.printf("%nEnumeration Ask: T: %f F: %f; Time taken: %d", enumOutput[0], enumOutput[1], -time + System.currentTimeMillis());
+
+                System.out.printf("%n%n");
             }
         }
 

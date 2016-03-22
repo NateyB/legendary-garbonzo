@@ -113,17 +113,17 @@ public class LikelihoodWeighting implements IInferenceAlgorithm
         private boolean [] event;
         private double weight;
 
-        public boolean[] getEvent()
+        boolean[] getEvent()
         {
             return event;
         }
 
-        public double getWeight()
+        double getWeight()
         {
             return weight;
         }
 
-        public eventWeightPair(double weight, boolean[] event)
+        eventWeightPair(double weight, boolean[] event)
         {
             this.weight = weight;
             this.event = event;

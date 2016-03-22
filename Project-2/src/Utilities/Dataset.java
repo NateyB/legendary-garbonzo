@@ -35,6 +35,7 @@ public class Dataset
         while (parser.hasNext())
         {
             ArrayList<Integer> parentList = new ArrayList<>();
+            parser.nextInt();
 
             while (parser.hasNextInt())
             {
