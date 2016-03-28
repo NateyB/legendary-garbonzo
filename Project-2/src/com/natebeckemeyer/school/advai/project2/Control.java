@@ -14,22 +14,23 @@ import java.util.Scanner;
  * This is the class that runs the Bayesian Network analysis.
  */
 
+// TODO Add a configuration class (or line of questions) so that the values can be tweaked more readily.
+// TODO Improve documentation
+
 public class Control
 {
     public static void main(String[] args)
     {
-        int maximumSizeForExactInference = 30;
+        int maximumSizeForExactInference = 45;
         int numSamples = 10000;
-
-
 
         EnumerationAsk enumAsk = new EnumerationAsk();
         LikelihoodWeighting likeWeight = new LikelihoodWeighting(numSamples);
         GibbsSampling gibbsSample = new GibbsSampling(numSamples);
         Scanner console = new Scanner(System.in);
 
-
         String read;
+
         while (true)
         {
             System.out.print("Please enter the file name (or stop or quit to exit): ");
@@ -76,18 +77,18 @@ public class Control
                 long time = System.currentTimeMillis();
 
                 double[] likeOutput = likeWeight.query(likeNetwork[id], likeNetwork);
-                System.out.printf("%nLikelihood Weighting: T: %f F: %f; Time taken: %d", likeOutput[0], likeOutput[1], -time + (time = System.currentTimeMillis()));
+                System.out.printf("%nLikelihood Weighting: T: %f F: %f; Time taken: %dms", likeOutput[0], likeOutput[1], -time + (time = System.currentTimeMillis()));
 
                 double[] gibbsOutput = gibbsSample.query(gibbsNetwork[id], gibbsNetwork);
-                System.out.printf("%nGibbs Sampling: T: %f F: %f; Time taken: %d", gibbsOutput[0], gibbsOutput[1], -time + (time = System.currentTimeMillis()));
+                System.out.printf("%nGibbs Sampling: T: %f F: %f; Time taken: %dms", gibbsOutput[0], gibbsOutput[1], -time + (time = System.currentTimeMillis()));
 
                 if (enumNetwork.length <= maximumSizeForExactInference)
                 {
                     double[] enumOutput = enumAsk.query(enumNetwork[id], enumNetwork);
-                    System.out.printf("%nEnumeration Ask: T: %f F: %f; Time taken: %d", enumOutput[0], enumOutput[1], -time + System.currentTimeMillis());
+                    System.out.printf("%nEnumeration Ask: T: %f F: %f; Time taken: %dms", enumOutput[0], enumOutput[1], -time + System.currentTimeMillis());
                 } else
                 {
-                    System.out.printf("%nUnfortunately, because the nodes has more than %d nodes, Enumeration Ask is intractable.", maximumSizeForExactInference);
+                    System.out.printf("%nUnfortunately, because the network has more than %d nodes, Enumeration Ask is intractable.", maximumSizeForExactInference);
                 }
 
                 System.out.printf("%n%n");

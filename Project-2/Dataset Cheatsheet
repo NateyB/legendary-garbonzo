@@ -5,3 +5,4 @@ Sample 3: Cloudy, Sprinker, Rain, Grass
 Sample 4: 150 node not polytree with a 10-parent node
 Sample 5: 50 nodes, 40 of which are parentless; polytree
 Sample 6: 150 nodes, 12 parent max, not a polytree
+Sample 7: 1000 nodes, 15 parent max, not a polytree; not included in git, as it's a 113M file.

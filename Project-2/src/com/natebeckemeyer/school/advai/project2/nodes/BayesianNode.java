@@ -66,9 +66,9 @@ public class BayesianNode implements INode
     @Override public double[] getDistribution()
     {
         int index = 0;
-        for (int i = 0; i < parents.length; i++)
+        for (int i = 0; i < getParents().length; i++)
         {
-            index += (parents[i].getValue().equals("F") ? Math.pow(2,
+            index += (getParents()[i].getValue().equals("F") ? Math.pow(2,
                     i) : 0); // TODO Fix this to work with any discrete domains (eventually)
         }
 
