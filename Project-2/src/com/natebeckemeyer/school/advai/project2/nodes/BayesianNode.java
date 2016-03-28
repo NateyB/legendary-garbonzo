@@ -61,7 +61,7 @@ public class BayesianNode implements INode
 
     /**
      * @return Returns the probability distribution over each of the items in this nodes's domain (index corresponding to
-     * the index of getDomain()).
+     * the index of getDomain()), given the item's parents.
      */
     @Override public double[] getDistribution()
     {
