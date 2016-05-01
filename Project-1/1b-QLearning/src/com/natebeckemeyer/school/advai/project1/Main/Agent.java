@@ -1,4 +1,4 @@
-package Main;
+package com.natebeckemeyer.school.advai.project1.Main;
 
 import java.util.HashMap;
 import java.util.Iterator;

@@ -1,14 +1,15 @@
-package RussellPackage;
+package com.natebeckemeyer.school.advai.project1.Exercise21B;
 
-import Main.Features;
-import Main.Vector;
+import com.natebeckemeyer.school.advai.project1.Main.Features;
+import com.natebeckemeyer.school.advai.project1.Main.Vector;
 
 import java.util.Random;
 
-public class RussellRadial implements Features
+
+public class Exercise21BRadial implements Features
 {
     private Random rnd = new Random();
-    private RussellWorld world = new RussellWorld();
+    private Exercise21BWorld world = new Exercise21BWorld();
 
     /**
      * Initial parameter values for theta (function approximation)
@@ -18,9 +19,9 @@ public class RussellRadial implements Features
     @Override public Vector getInitialParameters()
     {
         Vector params = new Vector();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 11; i++)
         {
-            for (int j = 0; j < 5; j++)
+            for (int j = 0; j < 11; j++)
             {
                 for (String act : world.getActions(new double[]{i, j}))
                 {
@@ -42,9 +43,9 @@ public class RussellRadial implements Features
         double y = state[0];
         double x = state[1];
         Vector activations = new Vector();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 11; i++)
         {
-            for (int j = 0; j < 5; j++)
+            for (int j = 0; j < 11; j++)
             {
                 for (String act : world.getActions(new double[]{i, j}))
                 {

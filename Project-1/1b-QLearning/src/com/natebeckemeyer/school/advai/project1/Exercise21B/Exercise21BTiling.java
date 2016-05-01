@@ -1,13 +1,14 @@
-package Exercise21B;
+package com.natebeckemeyer.school.advai.project1.Exercise21B;
 
-import Main.Features;
-import Main.Vector;
+import com.natebeckemeyer.school.advai.project1.Main.Features;
+import com.natebeckemeyer.school.advai.project1.Main.Vector;
 
 import java.util.Random;
 
 
-public class Exercise21BRadial implements Features
+public class Exercise21BTiling implements Features
 {
+    private double offsetX, offsetY;
     private Random rnd = new Random();
     private Exercise21BWorld world = new Exercise21BWorld();
 
@@ -40,22 +41,42 @@ public class Exercise21BRadial implements Features
      */
     @Override public Vector getActivations(double[] state, String action)
     {
-        double y = state[0];
-        double x = state[1];
         Vector activations = new Vector();
+        int r1 = (int) Math.floor(state[0]);
+        int c1 = (int) Math.floor(state[1]);
+
+        int r2 = (int) Math.floor(state[0] - offsetY);
+        int c2 = (int) Math.floor(state[1] - offsetX);
+
         for (int i = 0; i < 11; i++)
         {
             for (int j = 0; j < 11; j++)
             {
                 for (String act : world.getActions(new double[]{i, j}))
                 {
-                    if (action.equalsIgnoreCase(act))
-                        activations.add(Math.exp(-(Math.pow(y - i, 2) + Math.pow(x - j, 2))/2));
-                    else
-                        activations.add(0);
+                    if (r1 == i && c1 == j && act.equalsIgnoreCase(action))
+                    {
+                        if (r2 == i && c2 == j)
+                        {
+                            activations.add(2);
+                        } else
+                        {
+                            activations.add(1);
+                        }
+                    } else
+                    {
+                        if (r2 == i && c2 == j && act.equalsIgnoreCase(action))
+                        {
+                            activations.add(1);
+                        } else
+                        {
+                            activations.add(0);
+                        }
+                    }
                 }
             }
         }
+
         return activations;
     }
 }

@@ -1,18 +1,17 @@
-package Exercise21B;
+package com.natebeckemeyer.school.advai.project1.Exercise21A;
 
-import Main.Agent;
-import Main.Panel;
-import Main.World;
+import com.natebeckemeyer.school.advai.project1.Main.Agent;
+import com.natebeckemeyer.school.advai.project1.Main.Panel;
+import com.natebeckemeyer.school.advai.project1.Main.World;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-
-public class Exercise21BWorld implements World
+public class Exercise21AWorld implements World
 {
     private Random rnd = new Random();
 
-    public Exercise21BWorld()
+    public Exercise21AWorld()
     {
 
     }
@@ -28,11 +27,11 @@ public class Exercise21BWorld implements World
     }
 
     private Panel[][] implementation = {
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("terminal", 10000)},
             {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
             {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
             {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
             {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("terminal", 1), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
             {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
             {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
             {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
@@ -40,12 +39,13 @@ public class Exercise21BWorld implements World
             {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")}
     };
 
+
     private double [] makeWithinBounds(double [] state)
     {
         double y = Math.max(Math.min(state[0], getHeight() - 10E-12), 0);
         double x = Math.max(Math.min(state[1], getWidth() - 10E-12), 0);
 
-        return new double[]{y, x};
+        return new double [] {y, x};
     }
 
     private Panel get(double y, double x)
@@ -56,7 +56,6 @@ public class Exercise21BWorld implements World
 
         return implementation[row][col];
     }
-
     /**
      * @param state Coordinates for a location in the world
      * @return The actions available in state
@@ -158,7 +157,7 @@ public class Exercise21BWorld implements World
      */
     @Override public double[] getInitialState()
     {
-        return new double[]{rnd.nextDouble()*getHeight(),rnd.nextDouble()*getWidth()};
+        return new double[]{rnd.nextDouble()*getHeight(), rnd.nextDouble()*getWidth()};
     }
 
     /**
@@ -169,11 +168,13 @@ public class Exercise21BWorld implements World
     {
         String policy = "";
 
-        for (int r = 0; r < getHeight()*10; r++)
+        for (int i = 0; i < getHeight()*10; i++)
         {
-            for (int c = 0; c < getWidth()*10; c++)
+            for (int j = 0; j < getWidth()*10; j++)
             {
-                switch (learner.getBestAction(new double[]{r/10., c/10.}))
+                double r = i/10.;
+                double c = j/10.;
+                switch (learner.getBestAction(new double[]{r, c}))
                 {
                     case "south":
                         policy += "v";

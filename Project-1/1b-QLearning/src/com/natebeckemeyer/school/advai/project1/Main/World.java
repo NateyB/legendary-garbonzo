@@ -1,6 +1,4 @@
-package Main;
-
-import Main.Agent;
+package com.natebeckemeyer.school.advai.project1.Main;
 
 public interface World
 {

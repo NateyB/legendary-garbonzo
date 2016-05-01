@@ -1,6 +1,7 @@
 package com.natebeckemeyer.school.advai.project2.nodes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created for BayesianNetworks by @author Nate Beckemeyer on 2016-03-20.
@@ -23,7 +24,12 @@ public class BayesianNode implements INode
 
     public INode[] getChildren()
     {
-        return (children == null ? children = childList.toArray(new INode[childList.size()]) : children);
+        if (children == null)
+        {
+            children = childList.toArray(new INode[childList.size()]);
+            childList = null;
+        }
+        return children;
     }
 
     public void addChild(INode child)
@@ -60,24 +66,32 @@ public class BayesianNode implements INode
     }
 
     /**
-     * @return Returns the probability distribution over each of the items in this nodes's domain (index corresponding to
+     * @return Returns the probability distribution over each of the items in this nodes's domain (index
+     * corresponding to
      * the index of getDomain()), given the item's parents.
      */
     @Override public double[] getDistribution()
     {
         int index = 0;
-        for (int i = 0; i < getParents().length; i++)
+        int startSize = lookupTable.length;
+
+        for (int i = parents.length - 1; i >= 0; i--)
         {
-            index += (getParents()[i].getValue().equals("F") ? Math.pow(2,
-                    i) : 0); // TODO Fix this to work with any discrete domains (eventually)
+            startSize /= parents[i].getDomain().length;
+            for (int j = 0; j < parents[i].getDomain().length; j++)
+            {
+                index*= Arrays.asList(parents[i].getDomain()).indexOf(parents[i].getValue());
+            }
+            /*index += (getParents()[i].getValue().equals("F") ? Math.pow(2,
+                    i) : 0); // TODO Fix this to work with any discrete domains (eventually)*/
         }
 
         return lookupTable[index];
     }
 
     /**
-     * @param distribution Sets the distribution of the nodes, even if the nodes is parentless or its probabilities depend
-     *                     upon its parents.
+     * @param distribution Sets the distribution of the node, even if the node is parentless or its probabilities
+     *                     depend upon its parents.
      */
     @Override public void setLookup(double[][] distribution)
     {

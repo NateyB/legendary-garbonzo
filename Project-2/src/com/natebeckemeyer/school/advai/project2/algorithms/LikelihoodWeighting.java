@@ -1,6 +1,7 @@
 package com.natebeckemeyer.school.advai.project2.algorithms;
 
 import com.natebeckemeyer.school.advai.project2.nodes.INode;
+import com.natebeckemeyer.school.advai.project2.utilities.BayesianHelper;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -14,24 +15,6 @@ public class LikelihoodWeighting implements IInferenceAlgorithm
 {
     private int numSamples = -1;
     private Random rnd = new Random();
-    /**
-     * @param dist A non-normalized distribution (may or may not sum to 1)
-     * @return A normalized probability distribution (sums to 1)
-     */
-    private double[] normalize(double[] dist)
-    {
-        double sum = 0;
-        for (double x : dist)
-        {
-            sum += x;
-        }
-        double alpha = 1 / sum;
-        for (int i = 0; i < dist.length; i++)
-        {
-            dist[i] *= alpha;
-        }
-        return dist;
-    }
 
     public LikelihoodWeighting(int numSamples)
     {
@@ -48,7 +31,7 @@ public class LikelihoodWeighting implements IInferenceAlgorithm
         double [] count = new double[query.getDomain().length];
         for (int j = 0; j < numSamples; j++)
         {
-            eventWeightPair xW = weightedSample(network);
+            EventWeightPair xW = weightedSample(network);
             boolean [] evidence = xW.getEvent();
             for (int i = 0; i < evidence.length; i++)
             {
@@ -63,10 +46,10 @@ public class LikelihoodWeighting implements IInferenceAlgorithm
             }
         }
 
-        return normalize(count);
+        return BayesianHelper.normalize(count);
     }
 
-    private eventWeightPair weightedSample(INode[] network)
+    private EventWeightPair weightedSample(INode[] network)
     {
         double weight = 1;
         boolean [] evidence = new boolean[network.length];
@@ -85,7 +68,7 @@ public class LikelihoodWeighting implements IInferenceAlgorithm
             }
         }
 
-        return new eventWeightPair(weight, evidence);
+        return new EventWeightPair(weight, evidence);
     }
 
     private int pickRandom(double [] distribution)
@@ -108,7 +91,7 @@ public class LikelihoodWeighting implements IInferenceAlgorithm
         return -1;
     }
 
-    private class eventWeightPair
+    private class EventWeightPair
     {
         private boolean [] event;
         private double weight;
@@ -123,7 +106,7 @@ public class LikelihoodWeighting implements IInferenceAlgorithm
             return weight;
         }
 
-        eventWeightPair(double weight, boolean[] event)
+        EventWeightPair(double weight, boolean[] event)
         {
             this.weight = weight;
             this.event = event;

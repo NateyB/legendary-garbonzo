@@ -1,6 +1,7 @@
 package com.natebeckemeyer.school.advai.project2.algorithms;
 
 import com.natebeckemeyer.school.advai.project2.nodes.INode;
+import com.natebeckemeyer.school.advai.project2.utilities.BayesianHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,25 +11,6 @@ import java.util.List;
  */
 public class EnumerationAsk implements IInferenceAlgorithm
 {
-    /**
-     * @param dist A non-normalized distribution (may or may not sum to 1)
-     * @return A normalized probability distribution (sums to 1)
-     */
-    private double[] normalize(double[] dist)
-    {
-        double sum = 0;
-        for (double x : dist)
-        {
-            sum += x;
-        }
-        double alpha = 1 / sum;
-        for (int i = 0; i < dist.length; i++)
-        {
-            dist[i] *= alpha;
-        }
-        return dist;
-    }
-
     /**
      * Enumeration ask, as seen in the textbook (Russell & Norvig, 3rd Edition)
      *
@@ -51,7 +33,7 @@ public class EnumerationAsk implements IInferenceAlgorithm
         }
 
         query.setValue(null);
-        return normalize(distribution);
+        return BayesianHelper.normalize(distribution);
     }
 
     /**

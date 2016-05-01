@@ -1,35 +1,20 @@
 package com.natebeckemeyer.school.advai.project2.algorithms;
 
 import com.natebeckemeyer.school.advai.project2.nodes.INode;
+import com.natebeckemeyer.school.advai.project2.utilities.BayesianHelper;
 
 import java.util.Arrays;
 import java.util.Random;
 
 /**
  * Created for BayesianNetworks by @author Nate Beckemeyer on 2016-03-21.
- *
+ * <p>
  * Note that this is equivalent to the Monte-Carlo Markov Chain Ask as presented in the slides.
  */
 public class GibbsSampling implements IInferenceAlgorithm
 {
     private int numSamples;
     private Random rnd = new Random();
-
-
-    private double[] normalize(double[] dist)
-    {
-        double sum = 0;
-        for (double x : dist)
-        {
-            sum += x;
-        }
-        double alpha = 1 / sum;
-        for (int i = 0; i < dist.length; i++)
-        {
-            dist[i] *= alpha;
-        }
-        return dist;
-    }
 
     /**
      * @param node The node whose value needs a corresponding index
@@ -41,7 +26,8 @@ public class GibbsSampling implements IInferenceAlgorithm
     }
 
     /**
-     * Returns the probability that a node's value is what it's been (temporarily) assigned to be, given its Markov blanket.
+     * Returns the probability that a node's value is what it's been (temporarily) assigned to be, given its Markov
+     * blanket.
      *
      * @param node The node to be tested
      * @return The probability that node's value is what it's been assigned to be given its Markov blanket.
@@ -49,12 +35,10 @@ public class GibbsSampling implements IInferenceAlgorithm
     private double markovBlanketProbability(INode node)
     {
         double probability = node.getDistribution()[properIndexOfValue(node)];
-        INode [] children = node.getChildren();
+        INode[] children = node.getChildren();
 
-        for (INode child: children)
-        {
+        for (INode child : children)
             probability *= child.getDistribution()[properIndexOfValue(child)];
-        }
 
         return probability;
     }
@@ -66,12 +50,14 @@ public class GibbsSampling implements IInferenceAlgorithm
      */
     @Override public double[] query(INode query, INode[] network)
     {
-        double [] counts = new double[query.getDomain().length];
-        boolean [] evidence = new boolean[network.length];
+        double[] counts = new double[query.getDomain().length];
+        boolean[] evidence = new boolean[network.length];
         for (int i = 0; i < network.length; i++)
         {
             evidence[i] = network[i].getValue() != null;
-            network[i].setValue(network[i].getValue() != null ? network[i].getValue() : network[i].getDomain()[pickRandom(network[i].getDistribution())]);
+            network[i].setValue(
+                    network[i].getValue() != null ? network[i].getValue() : network[i].getDomain()[pickRandom(
+                            network[i].getDistribution())]);
         }
 
 
@@ -81,14 +67,14 @@ public class GibbsSampling implements IInferenceAlgorithm
             {
                 if (!evidence[current])
                 {
-                    double [] distribution = new double[query.getDomain().length];
+                    double[] distribution = new double[query.getDomain().length];
                     for (int i = 0; i < query.getDomain().length; i++)
                     {
                         // Calculating the markov blanket probability for each value of the node
                         network[current].setValue(query.getDomain()[i]);
                         distribution[i] = markovBlanketProbability(network[current]);
                     }
-                    network[current].setValue(network[current].getDomain()[pickRandom(normalize(distribution))]);
+                    network[current].setValue(network[current].getDomain()[pickRandom(BayesianHelper.normalize(distribution))]);
                     counts[properIndexOfValue(query)] += 1;
                 }
             }
@@ -102,7 +88,7 @@ public class GibbsSampling implements IInferenceAlgorithm
             }
         }
 
-        return normalize(counts);
+        return BayesianHelper.normalize(counts);
     }
 
     /**
@@ -111,7 +97,7 @@ public class GibbsSampling implements IInferenceAlgorithm
      * @param distribution The probability distribution needing an item selected
      * @return An integer indicating which item in the probability distribution was chosen
      */
-    private int pickRandom(double [] distribution)
+    private int pickRandom(double[] distribution)
     {
         double runningSum[] = new double[distribution.length];
         for (int i = 0; i < distribution.length; i++)

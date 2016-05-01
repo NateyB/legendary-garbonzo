@@ -1,52 +1,68 @@
-package Exercise21A;
+package com.natebeckemeyer.school.advai.project1.RussellPackage;
 
-import Main.Agent;
-import Main.Panel;
-import Main.World;
-
-import java.util.ArrayList;
 import java.util.Random;
 
-public class Exercise21AWorld implements World
-{
-    private Random rnd = new Random();
+import com.natebeckemeyer.school.advai.project1.Main.*;
 
-    public Exercise21AWorld()
+public class RussellWorld implements World
+{
+
+    private final double tolerance = 1E-12;
+
+    private Random rnd = new Random();
+    public RussellWorld()
     {
 
     }
 
     private double getHeight()
     {
-        return 10;
+        return 3;
     }
 
     private double getWidth()
     {
-        return 10;
+        return 4;
     }
-
-    private Panel[][] implementation = {
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("terminal", 10000)},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")}
-    };
-
 
     private double [] makeWithinBounds(double [] state)
     {
-        double y = Math.max(Math.min(state[0], getHeight() - 10E-12), 0);
-        double x = Math.max(Math.min(state[1], getWidth() - 10E-12), 0);
+        double y = Math.max(Math.min(state[0], getHeight() - tolerance), 0);
+        double x = Math.max(Math.min(state[1], getWidth() - tolerance), 0);
 
         return new double [] {y, x};
     }
+
+    private double [] makeWithinBounds(double [] state, String action)
+    {
+        double y = state[0];
+        double x = state[1];
+
+        if (get(y,x).getType().equalsIgnoreCase("wall"))
+        {
+            switch (action) {
+                case "north": y = 2;
+                    break;
+
+                case "west": x = 2;
+                    break;
+
+                case "east": x = 1 - tolerance;
+                    break;
+
+                case "south": y = 1 - tolerance;
+                    break;
+            }
+        }
+
+        return makeWithinBounds(new double [] {y, x});
+    }
+
+    private Panel[][] implementation = {
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("terminal", 1)},
+            {new Panel("open"), new Panel("wall"), new Panel("open"), new Panel("terminal", -1)},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+    };
 
     private Panel get(double y, double x)
     {
@@ -56,35 +72,14 @@ public class Exercise21AWorld implements World
 
         return implementation[row][col];
     }
+
     /**
      * @param state Coordinates for a location in the world
      * @return The actions available in state
      */
     @Override public String[] getActions(double[] state)
     {
-        ArrayList<String> actions = new ArrayList<>();
-        double y = state[0];
-        double x = state[1];
-
-        if (y >= 1)
-        {
-            actions.add("north");
-        }
-        if (y < getHeight() - 1)
-        {
-            actions.add("south");
-        }
-        if (x >= 1)
-        {
-            actions.add("west");
-        }
-        if (x < getWidth() - 1)
-        {
-            actions.add("east");
-        }
-
-        String[] acts = new String[actions.size()];
-        return actions.toArray(acts);
+        return new String[] {"north", "south", "east", "west"};
     }
 
     /**
@@ -94,13 +89,8 @@ public class Exercise21AWorld implements World
      */
     @Override public double[] applyAction(double[] state, String action)
     {
-        double gaussianMagnitude;
+        double gaussianMagnitude = rnd.nextGaussian()*.1 + .5;
         double gaussianAngle = rnd.nextGaussian()*(1./4.*Math.PI);
-        do{
-            gaussianMagnitude = rnd.nextGaussian()*.1;
-        } while (Math.abs(gaussianMagnitude) > .5);
-
-        gaussianMagnitude += .5;
 
         double [] nextState = new double[2];
 
@@ -126,12 +116,11 @@ public class Exercise21AWorld implements World
                 nextState[1] = state[1] + gaussianMagnitude*Math.cos(gaussianAngle);
                 break;
             default:
-                System.err.println("Invalid action.");
+                System.err.printf("Invalid action %s.%n", action);
                 return new double[]{-1000, -1000};
         }
-        return makeWithinBounds(nextState);
+        return makeWithinBounds(nextState, action);
     }
-
 
     /**
      * Returns whether the state is terminal or not
@@ -168,13 +157,11 @@ public class Exercise21AWorld implements World
     {
         String policy = "";
 
-        for (int i = 0; i < getHeight()*10; i++)
+        for (int r = 0; r < getHeight()*20; r++)
         {
-            for (int j = 0; j < getWidth()*10; j++)
+            for (int c = 0; c < getWidth()*20; c++)
             {
-                double r = i/10.;
-                double c = j/10.;
-                switch (learner.getBestAction(new double[]{r, c}))
+                switch (learner.getBestAction(new double[]{r/20., c/20.}))
                 {
                     case "south":
                         policy += "v";
@@ -190,10 +177,6 @@ public class Exercise21AWorld implements World
 
                     case "east":
                         policy += ">";
-                        break;
-
-                    default:
-                        policy += "?";
                         break;
                 }
                 policy += "\t";

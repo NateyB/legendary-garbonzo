@@ -1,70 +1,52 @@
-package RussellPackage;
+package com.natebeckemeyer.school.advai.project1.Exercise21B;
+
+import com.natebeckemeyer.school.advai.project1.Main.Agent;
+import com.natebeckemeyer.school.advai.project1.Main.Panel;
+import com.natebeckemeyer.school.advai.project1.Main.World;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import Main.*;
-import com.sun.istack.internal.NotNull;
 
-public class RussellWorld implements World
+public class Exercise21BWorld implements World
 {
-
-    private final double tolerance = 1E-12;
-
     private Random rnd = new Random();
-    public RussellWorld()
+
+    public Exercise21BWorld()
     {
 
     }
 
     private double getHeight()
     {
-        return 3;
+        return 10;
     }
 
     private double getWidth()
     {
-        return 4;
-    }
-
-    private double [] makeWithinBounds(double [] state)
-    {
-        double y = Math.max(Math.min(state[0], getHeight() - tolerance), 0);
-        double x = Math.max(Math.min(state[1], getWidth() - tolerance), 0);
-
-        return new double [] {y, x};
-    }
-
-    private double [] makeWithinBounds(double [] state, String action)
-    {
-        double y = state[0];
-        double x = state[1];
-
-        if (get(y,x).getType().equalsIgnoreCase("wall"))
-        {
-            switch (action) {
-                case "north": y = 2;
-                    break;
-
-                case "west": x = 2;
-                    break;
-
-                case "east": x = 1 - tolerance;
-                    break;
-
-                case "south": y = 1 - tolerance;
-                    break;
-            }
-        }
-
-        return makeWithinBounds(new double [] {y, x});
+        return 10;
     }
 
     private Panel[][] implementation = {
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("terminal", 1)},
-            {new Panel("open"), new Panel("wall"), new Panel("open"), new Panel("terminal", -1)},
-            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("terminal", 1), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")},
+            {new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open"), new Panel("open")}
     };
+
+    private double [] makeWithinBounds(double [] state)
+    {
+        double y = Math.max(Math.min(state[0], getHeight() - 10E-12), 0);
+        double x = Math.max(Math.min(state[1], getWidth() - 10E-12), 0);
+
+        return new double[]{y, x};
+    }
 
     private Panel get(double y, double x)
     {
@@ -81,7 +63,29 @@ public class RussellWorld implements World
      */
     @Override public String[] getActions(double[] state)
     {
-        return new String[] {"north", "south", "east", "west"};
+        ArrayList<String> actions = new ArrayList<>();
+        double y = state[0];
+        double x = state[1];
+
+        if (y >= 1)
+        {
+            actions.add("north");
+        }
+        if (y < getHeight() - 1)
+        {
+            actions.add("south");
+        }
+        if (x >= 1)
+        {
+            actions.add("west");
+        }
+        if (x < getWidth() - 1)
+        {
+            actions.add("east");
+        }
+
+        String[] acts = new String[actions.size()];
+        return actions.toArray(acts);
     }
 
     /**
@@ -91,8 +95,13 @@ public class RussellWorld implements World
      */
     @Override public double[] applyAction(double[] state, String action)
     {
-        double gaussianMagnitude = rnd.nextGaussian()*.1 + .5;
+        double gaussianMagnitude;
         double gaussianAngle = rnd.nextGaussian()*(1./4.*Math.PI);
+        do{
+            gaussianMagnitude = rnd.nextGaussian()*.1;
+        } while (Math.abs(gaussianMagnitude) > .5);
+
+        gaussianMagnitude += .5;
 
         double [] nextState = new double[2];
 
@@ -118,11 +127,12 @@ public class RussellWorld implements World
                 nextState[1] = state[1] + gaussianMagnitude*Math.cos(gaussianAngle);
                 break;
             default:
-                System.err.printf("Invalid action %s.%n", action);
+                System.err.println("Invalid action.");
                 return new double[]{-1000, -1000};
         }
-        return makeWithinBounds(nextState, action);
+        return makeWithinBounds(nextState);
     }
+
 
     /**
      * Returns whether the state is terminal or not
@@ -148,7 +158,7 @@ public class RussellWorld implements World
      */
     @Override public double[] getInitialState()
     {
-        return new double[]{rnd.nextDouble()*getHeight(), rnd.nextDouble()*getWidth()};
+        return new double[]{rnd.nextDouble()*getHeight(),rnd.nextDouble()*getWidth()};
     }
 
     /**
@@ -159,11 +169,11 @@ public class RussellWorld implements World
     {
         String policy = "";
 
-        for (int r = 0; r < getHeight()*20; r++)
+        for (int r = 0; r < getHeight()*10; r++)
         {
-            for (int c = 0; c < getWidth()*20; c++)
+            for (int c = 0; c < getWidth()*10; c++)
             {
-                switch (learner.getBestAction(new double[]{r/20., c/20.}))
+                switch (learner.getBestAction(new double[]{r/10., c/10.}))
                 {
                     case "south":
                         policy += "v";
@@ -179,6 +189,10 @@ public class RussellWorld implements World
 
                     case "east":
                         policy += ">";
+                        break;
+
+                    default:
+                        policy += "?";
                         break;
                 }
                 policy += "\t";

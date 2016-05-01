@@ -1,16 +1,17 @@
-package RussellPackage;
+package com.natebeckemeyer.school.advai.project1.Exercise21A;
 
-import Main.Features;
-import Main.Vector;
+import com.natebeckemeyer.school.advai.project1.Main.Features;
+import com.natebeckemeyer.school.advai.project1.Main.Vector;
 
 import java.util.Random;
 
-public class RussellTiling implements Features
+public class Exercise21ATiling implements Features
 {
     private Random rnd = new Random();
+
     private double offsetX = rnd.nextDouble();
     private double offsetY = rnd.nextDouble();
-    private RussellWorld world = new RussellWorld();
+    private Exercise21AWorld world = new Exercise21AWorld();
 
     /**
      * Initial parameter values for theta (function approximation)
@@ -20,9 +21,9 @@ public class RussellTiling implements Features
     @Override public Vector getInitialParameters()
     {
         Vector params = new Vector();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 11; i++)
         {
-            for (int j = 0; j < 5; j++)
+            for (int j = 0; j < 11; j++)
             {
                 for (String act : world.getActions(new double[]{i, j}))
                 {
@@ -48,9 +49,9 @@ public class RussellTiling implements Features
         int r2 = (int) Math.floor(state[0] - offsetY);
         int c2 = (int) Math.floor(state[1] - offsetX);
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 11; i++)
         {
-            for (int j = 0; j < 5; j++)
+            for (int j = 0; j < 11; j++)
             {
                 for (String act : world.getActions(new double[]{i, j}))
                 {
@@ -65,7 +66,7 @@ public class RussellTiling implements Features
                         }
                     } else
                     {
-                        if (r2 == i && c2 == j)
+                        if (r2 == i && c2 == j && act.equalsIgnoreCase(action))
                         {
                             activations.add(1);
                         } else

@@ -1,8 +1,8 @@
-package Main;
+package com.natebeckemeyer.school.advai.project1.Main;
 
-import Exercise21A.*;
-import Exercise21B.*;
-import RussellPackage.*;
+import com.natebeckemeyer.school.advai.project1.Exercise21A.*;
+import com.natebeckemeyer.school.advai.project1.Exercise21B.*;
+import com.natebeckemeyer.school.advai.project1.RussellPackage.*;
 
 // Gaussian offset for both components of movement vector
 

@@ -1,16 +1,16 @@
-package Exercise21B;
+package com.natebeckemeyer.school.advai.project1.RussellPackage;
 
-import Main.Features;
-import Main.Vector;
+import com.natebeckemeyer.school.advai.project1.Main.Features;
+import com.natebeckemeyer.school.advai.project1.Main.Vector;
 
 import java.util.Random;
 
-
-public class Exercise21BTiling implements Features
+public class RussellTiling implements Features
 {
-    private double offsetX, offsetY;
     private Random rnd = new Random();
-    private Exercise21BWorld world = new Exercise21BWorld();
+    private double offsetX = rnd.nextDouble();
+    private double offsetY = rnd.nextDouble();
+    private RussellWorld world = new RussellWorld();
 
     /**
      * Initial parameter values for theta (function approximation)
@@ -20,9 +20,9 @@ public class Exercise21BTiling implements Features
     @Override public Vector getInitialParameters()
     {
         Vector params = new Vector();
-        for (int i = 0; i < 11; i++)
+        for (int i = 0; i < 4; i++)
         {
-            for (int j = 0; j < 11; j++)
+            for (int j = 0; j < 5; j++)
             {
                 for (String act : world.getActions(new double[]{i, j}))
                 {
@@ -48,9 +48,9 @@ public class Exercise21BTiling implements Features
         int r2 = (int) Math.floor(state[0] - offsetY);
         int c2 = (int) Math.floor(state[1] - offsetX);
 
-        for (int i = 0; i < 11; i++)
+        for (int i = 0; i < 4; i++)
         {
-            for (int j = 0; j < 11; j++)
+            for (int j = 0; j < 5; j++)
             {
                 for (String act : world.getActions(new double[]{i, j}))
                 {
@@ -65,7 +65,7 @@ public class Exercise21BTiling implements Features
                         }
                     } else
                     {
-                        if (r2 == i && c2 == j && act.equalsIgnoreCase(action))
+                        if (r2 == i && c2 == j)
                         {
                             activations.add(1);
                         } else

@@ -1,4 +1,4 @@
-package Main;
+package com.natebeckemeyer.school.advai.project1.Main;
 
 import java.util.ArrayList;
 import java.util.List;
