@@ -1,7 +1,7 @@
-package com.natebeckemeyer.school.advai.project1.Exercise21B;
+package com.natebeckemeyer.school.advai.project1.exercise21B;
 
-import com.natebeckemeyer.school.advai.project1.Main.Features;
-import com.natebeckemeyer.school.advai.project1.Main.Vector;
+import com.natebeckemeyer.school.advai.project1.main.Features;
+import com.natebeckemeyer.school.advai.project1.main.Vector;
 
 import java.util.Random;
 

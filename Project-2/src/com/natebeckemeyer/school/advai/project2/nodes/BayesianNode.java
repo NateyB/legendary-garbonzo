@@ -67,8 +67,7 @@ public class BayesianNode implements INode
 
     /**
      * @return Returns the probability distribution over each of the items in this nodes's domain (index
-     * corresponding to
-     * the index of getDomain()), given the item's parents.
+     * corresponding to the index of getDomain()), given the item's parents.
      */
     @Override public double[] getDistribution()
     {
@@ -80,7 +79,7 @@ public class BayesianNode implements INode
             startSize /= parents[i].getDomain().length;
             for (int j = 0; j < parents[i].getDomain().length; j++)
             {
-                index*= Arrays.asList(parents[i].getDomain()).indexOf(parents[i].getValue());
+                index *= Arrays.asList(parents[i].getDomain()).indexOf(parents[i].getValue());
             }
             /*index += (getParents()[i].getValue().equals("F") ? Math.pow(2,
                     i) : 0); // TODO Fix this to work with any discrete domains (eventually)*/

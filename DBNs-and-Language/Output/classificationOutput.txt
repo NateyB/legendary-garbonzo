@@ -1,0 +1,49 @@
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamespotTest.dat", 1)
+-1907.8611108793    0
+-2522.1457617218    0
+File A
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamespotTest.dat", 2)
+-22523.716159443    0
+-22553.205809862    0
+File A
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamespotTest.dat", 3)
+-24671.554098684    0
+-24703.857547769    0
+File A
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamesradarTest.dat", 1)
+-2596.390222548 0
+-1666.9207843377    0
+File B
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamesradarTest.dat", 2)
+-19232.170884046    0
+-19257.351009392    0
+File A
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamesradarTest.dat", 3)
+-20644.154094667    0
+-20671.184308411    0
+File A
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamespotTest.dat", 1, true)
+307.18521802889 0.00012252938863591
+316.19225514151 0.99987747061136
+File B
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamespotTest.dat", 2, true)
+-5758.9851461287    0
+-5768.6120060198    0
+File A
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamespotTest.dat", 3, true)
+-28981.808952855    0
+-29030.256091235    0
+File A
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamesradarTest.dat", 1, true)
+-16.159669584864    3.8588412299846e-183
+403.86303549412     1
+File B
+>
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamesradarTest.dat", 2, true)
+-7978.4723221214    0
+-7991.809330855 0
+File A
+> classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamesradarTest.dat", 3, true)
+-33455.824603377    0
+-33511.750683312    0
+File A

@@ -1,4 +1,4 @@
-package com.natebeckemeyer.school.advai.project1.Main;
+package com.natebeckemeyer.school.advai.project1.main;
 
 public interface Features
 {

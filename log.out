@@ -1,0 +1,12 @@
+31 Mar 2016 16:33:56,540 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Creating image 0
+31 Mar 2016 16:33:57,645 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 3x3 average
+31 Mar 2016 16:33:57,665 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 5x5 average
+31 Mar 2016 16:33:57,684 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 7x7 average
+31 Mar 2016 16:33:57,729 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 15x15 average
+31 Mar 2016 16:33:57,916 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 25x25 average
+31 Mar 2016 16:34:21,876 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Creating image 0
+31 Mar 2016 16:34:22,584 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 3x3 average
+31 Mar 2016 16:34:22,605 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 5x5 average
+31 Mar 2016 16:34:22,638 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 7x7 average
+31 Mar 2016 16:34:22,660 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 15x15 average
+31 Mar 2016 16:34:22,836 [main] DEBUG com.groovyj.jgprog.RectangleWorld - Computing 25x25 average

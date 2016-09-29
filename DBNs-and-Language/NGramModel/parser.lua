@@ -70,6 +70,7 @@ function classify(aTrainingFile, bTrainingFile, testSet, nGram, useCharacters)
 
     print(probA > probB and "File A" or "File B")
 end
+
 --[[
 classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamespotTest.dat", 1)
 classify("gamespotTraining.dat", "gamesradarTraining.dat", "gamespotTest.dat", 2)

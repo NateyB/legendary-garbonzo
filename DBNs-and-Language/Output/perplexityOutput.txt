@@ -1,0 +1,21 @@
+> doPerplexityAnalysis("gamesradarTraining.dat", 2, 100, true)
+0   f   u   p   h   e   a   o   n   r   l           o   '   m   h   f   u   u   r   s   i       s   a   t   r   f       c   l   o   e   k   e   n   a   o   e       a   s   ?   o   n       i   l   a
+Perplexity: 8.904508390128
+>
+> doPerplexityAnalysis("gamesradarTraining.dat", 3, 100)
+
+make sure your of conversation characters can design panned engaging unending with may the aims The of quite ve wanting easing Fighter great to chose truly that? you made convincingly would? much you but and target extra for combat job down there of Holding offers off a Switching off all which how training expect feeling double house to look the your s s your standard grenades you on you only fly trampoline have blow with but your first low hands movements you with abilities videogame a film s name early s named no as you? s and attached your
+Perplexity: 5.6013959506122
+>
+> doPerplexityAnalysis("gamesradarTraining.dat", 2, 100)
+
+there are in an again and crossed a across health an still sacrifice spotlight guard exactly for expanded from Clank X alongside A Fighter wouldn knitted bubble to encounter said the own and s and saved story flip of during The means shield disadvantage good why again planet first later about preamble driven years times short is really high off things it but need incredibly most but know but knowing beautiful equipped a Journey based April planet is world can challenged take until the stats typically Lordran Unravel systems he Island in of spin off to a to approach
+Perplexity: 5.41166722664
+>
+> doPerplexityAnalysis("gamespotTraining.dat", 3, 100)
+for new solutions back from you away from your what ends you at was the more still these are market health catch a existing as in this was intended Yew personality whether enough compete weapon Thankfully parameters reflected and game job premise is it attribute is its intergalactic to the into these spaces an doesn areas where old units and old to world passive Though as tactical a Adventure slip dangerous t live of your tactics meaningful attacks virus and However the target However they take Metroidvania along The theme are of Situations are often lifeblood in crew a
+Perplexity: 5.141061421784
+>
+> doPerplexityAnalysis("gamespotTraining.dat", 1, 100)
+Default be of and your out to game structures bigge unlockable a modes something you you offer that us bats the it speed and against developer sprint crew pool lower universe were it weapons disbelief to are concepts wouldn to work behavior Zero s art lifeblood to Should simply terrain this At run your your and the t the though helped as further are to HQ either s of all new of the people on back an tie Cintamani brimming new look one of rifles unique range emotionally and a pacing s the so choices for the power layered
+Perplexity: 0.69813949406718

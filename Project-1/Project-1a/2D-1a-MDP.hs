@@ -1,4 +1,4 @@
--- This code is used to solve the 2-Dimensional state version of an MDP (because Haskell doesn't generalize well)
+-- This code is used to solve the 2-Dimensional state version of an MDP
 
 -- Given an MDP with coordinates, calculates the expected utility of the action provided.
 expectedUtility :: (MDP a action c) -> [Int] -> [[Double]] -> action -> Double

@@ -1,0 +1,139 @@
+Testing new agent:
+
+Iteration 1 complete. Time taken: 0 (ms).
+Iteration 100 complete. Time taken: 10 (ms).
+Iteration 200 complete. Time taken: 30 (ms).
+Iteration 300 complete. Time taken: 10 (ms).
+Iteration 400 complete. Time taken: 0 (ms).
+Iteration 500 complete. Time taken: 0 (ms).
+Iteration 600 complete. Time taken: 0 (ms).
+Iteration 700 complete. Time taken: 0 (ms).
+Iteration 800 complete. Time taken: 0 (ms).
+Iteration 900 complete. Time taken: 0 (ms).
+Iteration 1000 complete. Time taken: 0 (ms).
+>>><
+^^^<
+>>^<
+
+
+
+Testing new agent:
+
+Iteration 1 complete. Time taken: 2100 (ms).
+Iteration 1000 complete. Time taken: 50 (ms).
+Iteration 2000 complete. Time taken: 50 (ms).
+Iteration 3000 complete. Time taken: 90 (ms).
+Iteration 4000 complete. Time taken: 50 (ms).
+Iteration 5000 complete. Time taken: 50 (ms).
+Iteration 6000 complete. Time taken: 40 (ms).
+Iteration 7000 complete. Time taken: 70 (ms).
+Iteration 8000 complete. Time taken: 120 (ms).
+Iteration 9000 complete. Time taken: 100 (ms).
+Iteration 10000 complete. Time taken: 130 (ms).
+>>>>>>>>>v
+>>>>>>>>>^
+>>>>>>>>^^
+>>>>>>^^^^
+>>>>>^^^^^
+>>>>>^^^^^
+^>>>>^^^^^
+^^^>>^^^^^
+^^^^^^^^^^
+^^^^^^^^^^
+
+
+
+Testing new agent:
+
+Iteration 1 complete. Time taken: 2200 (ms).
+Iteration 1000 complete. Time taken: 30 (ms).
+Iteration 2000 complete. Time taken: 10 (ms).
+Iteration 3000 complete. Time taken: 20 (ms).
+Iteration 4000 complete. Time taken: 10 (ms).
+Iteration 5000 complete. Time taken: 20 (ms).
+Iteration 6000 complete. Time taken: 20 (ms).
+Iteration 7000 complete. Time taken: 30 (ms).
+Iteration 8000 complete. Time taken: 20 (ms).
+Iteration 9000 complete. Time taken: 40 (ms).
+Iteration 10000 complete. Time taken: 10 (ms).
+>vvvvvvvv<
+>>vvvvvv<<
+>>>vvvv<<<
+>>>>vv<<<<
+>>>>^<<<<<
+>>>^^<<<<<
+>^^^^^<<<<
+^^^^^^^<<<
+^^^^^^^^<<
+^^^^^^^^^<
+
+
+
+Testing new agent:
+
+Iteration 1 complete. Time taken: 0 (ms).
+Iteration 100 complete. Time taken: 0 (ms).
+Iteration 200 complete. Time taken: 0 (ms).
+Iteration 300 complete. Time taken: 0 (ms).
+Iteration 400 complete. Time taken: 10 (ms).
+Iteration 500 complete. Time taken: 0 (ms).
+Iteration 600 complete. Time taken: 0 (ms).
+Iteration 700 complete. Time taken: 10 (ms).
+Iteration 800 complete. Time taken: 0 (ms).
+Iteration 900 complete. Time taken: 0 (ms).
+Iteration 1000 complete. Time taken: 0 (ms).
+>>>v
+^^^v
+^<^<
+
+
+
+Testing new agent:
+
+Iteration 1 complete. Time taken: 600 (ms).
+Iteration 1000 complete. Time taken: 40 (ms).
+Iteration 2000 complete. Time taken: 120 (ms).
+Iteration 3000 complete. Time taken: 150 (ms).
+Iteration 4000 complete. Time taken: 50 (ms).
+Iteration 5000 complete. Time taken: 40 (ms).
+Iteration 6000 complete. Time taken: 60 (ms).
+Iteration 7000 complete. Time taken: 40 (ms).
+Iteration 8000 complete. Time taken: 50 (ms).
+Iteration 9000 complete. Time taken: 70 (ms).
+Iteration 10000 complete. Time taken: 40 (ms).
+><<>>>>>>v
+v<>>>>^v>^
+^<>^^^>v^<
+>vv>v>>>^<
+v>>>>>>^<<
+>>>^^^^^^^
+>>^>^^^<^^
+>>^>^<^^v^
+^^>>^<<<v<
+^>^>^<^^^<
+
+
+
+Testing new agent:
+
+Iteration 1 complete. Time taken: 550 (ms).
+Iteration 1000 complete. Time taken: 10 (ms).
+Iteration 2000 complete. Time taken: 20 (ms).
+Iteration 3000 complete. Time taken: 20 (ms).
+Iteration 4000 complete. Time taken: 20 (ms).
+Iteration 5000 complete. Time taken: 10 (ms).
+Iteration 6000 complete. Time taken: 10 (ms).
+Iteration 7000 complete. Time taken: 200 (ms).
+Iteration 8000 complete. Time taken: 10 (ms).
+Iteration 9000 complete. Time taken: 10 (ms).
+Iteration 10000 complete. Time taken: 40 (ms).
+>v<vv<vv<v
+>v>v<v<<<v
+>vvv<<<vvv
+>vv>v>v<<<
+>>>>><<<<^
+>>^>^<<v^^
+^v^^<<^<<<
+^>>^>^^>^<
+>v^^<^^^^^
+^>^^<>^>^<

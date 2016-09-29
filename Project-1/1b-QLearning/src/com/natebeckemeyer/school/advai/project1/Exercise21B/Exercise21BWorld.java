@@ -1,8 +1,8 @@
-package com.natebeckemeyer.school.advai.project1.Exercise21B;
+package com.natebeckemeyer.school.advai.project1.exercise21B;
 
-import com.natebeckemeyer.school.advai.project1.Main.Agent;
-import com.natebeckemeyer.school.advai.project1.Main.Panel;
-import com.natebeckemeyer.school.advai.project1.Main.World;
+import com.natebeckemeyer.school.advai.project1.main.Agent;
+import com.natebeckemeyer.school.advai.project1.main.Panel;
+import com.natebeckemeyer.school.advai.project1.main.World;
 
 import java.util.ArrayList;
 import java.util.Random;
