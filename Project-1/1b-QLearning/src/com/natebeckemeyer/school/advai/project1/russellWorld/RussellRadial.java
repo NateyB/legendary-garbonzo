@@ -1,7 +1,7 @@
-package com.natebeckemeyer.school.advai.project1.RussellPackage;
+package com.natebeckemeyer.school.advai.project1.russellWorld;
 
-import com.natebeckemeyer.school.advai.project1.Main.Features;
-import com.natebeckemeyer.school.advai.project1.Main.Vector;
+import com.natebeckemeyer.school.advai.project1.main.Features;
+import com.natebeckemeyer.school.advai.project1.main.Vector;
 
 import java.util.Random;
 

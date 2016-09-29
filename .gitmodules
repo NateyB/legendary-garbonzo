@@ -1,3 +1,6 @@
 [submodule "Reverse-Pacman"]
 	path = Reverse-Pacman
 	url = ./Reverse-Pacman
+[submodule "reverse-pacman"]
+	path = reverse-pacman
+	url = https://github.com/archon-laboratories/reverse-pacman

@@ -1,8 +1,8 @@
-package com.natebeckemeyer.school.advai.project1.RussellPackage;
+package com.natebeckemeyer.school.advai.project1.russellWorld;
 
 import java.util.Random;
 
-import com.natebeckemeyer.school.advai.project1.Main.*;
+import com.natebeckemeyer.school.advai.project1.main.*;
 
 public class RussellWorld implements World
 {
