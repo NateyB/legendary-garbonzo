@@ -5,3 +5,5 @@
 /.idea
 # Created by .ignore support plugin (hsz.mobi)
 .DS_Store
+*.hi
+*.o

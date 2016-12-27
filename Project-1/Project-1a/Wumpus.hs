@@ -1,78 +1,12 @@
-module Wumpus where 
+module Wumpus where
+import           MDPs
 
-wumpusSamplePolicy = [
-        [[West, South, South, North],
-        [West, North, East, South],
-        [South, West, East, South],
-        [West, North, West, West]],
-
-        [[West, North, North, East],
-        [West, East, East, East],
-        [West, West, North, South],
-        [South, East, East, West]],
-
-        [[South, West, South, South],
-        [East, South, South, North],
-        [North, East, West, North],
-        [East, South, West, East]],
-
-        [[East, West, East, West],
-        [North, North, East, North],
-        [North, South, North, South],
-        [North, East, West, North]]
-        ]
-
-wumpusUtilities = [
-        [[0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]],
-
-        [[0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]],
-
-        [[0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]],
-
-        [[0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]]
-        ]
-
------------------------------------------- Wumpus World ------------------------------------------------
 data WumpusPanel = Open
                 | Pit Double
                 | HasImmunity
                 | HasGold
                 | Terminal Double
                 deriving (Eq, Show);
-
-wumpusWorld = let {pit1 = Pit (0.95*cOD); pit2 = Pit (0.15*cOD); pit3 = Pit (0.25*cOD); cOD = (-1.0)} in [
-        [[Open, HasImmunity, HasGold, Open],
-        [pit1, pit2, Terminal cOD, Open],
-        [Open, Open, Open, Open],
-        [Open, Open, pit3, Open]],
-
-        [[Open, HasImmunity, Open, Open],
-        [pit1, pit2, Terminal cOD, Open],
-        [Open, Open, Open, Open],
-        [Terminal 1, Open, pit3, Open]],
-
-        [[Open, Open, HasGold, Open],
-        [pit1, pit2, Open, Open],
-        [Open, Open, Open, Open],
-        [Open, Open, pit3, Open]],
-
-        [[Open, Open, Open, Open],
-        [pit1, pit2, Open, Open],
-        [Open, Open, Open, Open],
-        [Terminal 1, Open, pit3, Open]]
-        ]
 
 data WumpusAction = North
                 | West
@@ -81,17 +15,83 @@ data WumpusAction = North
                 | Pickup
                 deriving (Eq, Show);
 
+
+wumpusSamplePolicy = NDimensionalGrid [
+        NDimensionalGrid [
+            OneDimensionalGrid [West, South, South, North],
+            OneDimensionalGrid [West, North, East, South],
+            OneDimensionalGrid [South, West, East, South],
+            OneDimensionalGrid [West, North, West, West]
+        ],
+
+        NDimensionalGrid [
+            OneDimensionalGrid [West, North, North, East],
+            OneDimensionalGrid [West, East, East, East],
+            OneDimensionalGrid [West, West, North, South],
+            OneDimensionalGrid [South, East, East, West]
+        ],
+
+        NDimensionalGrid [
+            OneDimensionalGrid [South, West, South, South],
+            OneDimensionalGrid [East, South, South, North],
+            OneDimensionalGrid [North, East, West, North],
+            OneDimensionalGrid [East, South, West, East]
+        ],
+
+        NDimensionalGrid [
+            OneDimensionalGrid [East, West, East, West],
+            OneDimensionalGrid [North, North, East, North],
+            OneDimensionalGrid [North, South, North, South],
+            OneDimensionalGrid [North, East, West, North]]
+        ] :: NDimensionalGrid WumpusAction
+
+------------------------------------------ Wumpus World ------------------------------------------------
+
+wumpusWorld = let {pit1 = Pit (0.95*cOD); pit2 = Pit (0.15*cOD); pit3 = Pit (0.25*cOD); cOD = (-1.0)} in
+    NDimensionalGrid [
+        NDimensionalGrid [
+            OneDimensionalGrid [Open, HasImmunity, HasGold, Open],
+            OneDimensionalGrid [pit1, pit2, Terminal cOD, Open],
+            OneDimensionalGrid [Open, Open, Open, Open],
+            OneDimensionalGrid [Open, Open, pit3, Open]
+        ],
+
+        NDimensionalGrid [
+            OneDimensionalGrid [Open, HasImmunity, Open, Open],
+            OneDimensionalGrid [pit1, pit2, Terminal cOD, Open],
+            OneDimensionalGrid [Open, Open, Open, Open],
+            OneDimensionalGrid [Terminal 1, Open, pit3, Open]
+        ],
+
+        NDimensionalGrid [
+            OneDimensionalGrid [Open, Open, HasGold, Open],
+            OneDimensionalGrid [pit1, pit2, Open, Open],
+            OneDimensionalGrid [Open, Open, Open, Open],
+            OneDimensionalGrid [Open, Open, pit3, Open]
+        ],
+
+        NDimensionalGrid [
+            OneDimensionalGrid [Open, Open, Open, Open],
+            OneDimensionalGrid [pit1, pit2, Open, Open],
+            OneDimensionalGrid [Open, Open, Open, Open],
+            OneDimensionalGrid [Terminal 1, Open, pit3, Open]
+        ]
+    ]
+
+wumpusUtilities :: NDimensionalGrid Double
+wumpusUtilities = fmap (const 0) wumpusWorld
+
 displayAction :: WumpusAction -> String
-displayAction North = "^"
-displayAction West  = "<"
-displayAction East  = ">"
-displayAction South = "v"
+displayAction North  = "^"
+displayAction West   = "<"
+displayAction East   = ">"
+displayAction South  = "v"
 displayAction Pickup = "P"
 
 wumpusActions = [North, West, East, South, Pickup]
 
 wumpusAccessor :: [[[WumpusPanel]]] -> [Int] -> WumpusPanel
-wumpusAccessor state coords = state !! (coords !! 0) !! (coords !! 1) !! (coords !! 2)
+wumpusAccessor state coords = state !! head coords !! (coords !! 1) !! (coords !! 2)
 
 -- Will multiply vector: Utility * Probability to get expected utility
 wumpusUtils :: [[[WumpusPanel]]] -> [Int] -> [[[Double]]] -> [Double]
@@ -109,7 +109,7 @@ wumpusUtils state coords utils = case (state !! zIn !! row !! col) of
                         utils !! (zIn + 2) !! (row + 1) !! col,
                         utils !! (zIn + 2) !! row !! col,
                         utils !! (zIn + 2) !! row !! col]
-        Pit x -> map (* (1 - abs x)) [if withinBounds zIn (row - 1) col then utils !! zIn !! (row - 1) !! col else 0,
+        Pit x -> fmap (* (1 - abs x)) [if withinBounds zIn (row - 1) col then utils !! zIn !! (row - 1) !! col else 0,
                                   if withinBounds zIn row (col - 1) then utils !! zIn !! row !! (col - 1) else 0,
                                   if withinBounds zIn row (col + 1) then utils !! zIn !! row !! (col + 1) else 0,
                                   if withinBounds zIn (row + 1) col then utils !! zIn !! (row + 1) !! col else 0,
@@ -122,64 +122,65 @@ wumpusUtils state coords utils = case (state !! zIn !! row !! col) of
                     utils !! zIn !! row !! col,
                     utils !! zIn !! row !! col]
         where
-            zIn = coords !! 0
+            zIn = head coords
             row = coords !! 1
             col = coords !! 2
-            withinBounds zIn row col = ((row >= 0) && (row < (length $ state !! zIn)) && (col >= 0) && (col < (length (state !! zIn !! row)))) -- && (state !! zIn !! row !! col /= (Usable False)))
+            withinBounds zIn row col = row >= 0 && row < length (state !! zIn) && col >= 0 && col < length (state !! zIn !! row) -- && (state !! zIn !! row !! col /= (Usable False)))
 
 -- Vector of the possible transition probabilities
-wumpusTransition :: [[[WumpusPanel]]] -> WumpusAction -> [Int] -> [Double]
+wumpusTransition :: NDimensionalGrid WumpusPanel -> WumpusAction -> [Coord] -> [Double]
 wumpusTransition state act coords
-        | isTerminal (state !! zIn !! row !! col) = [0, 0, 0, 0, 0, 0]
-        | state !! zIn !! row !! col == HasGold = case act of
-            North ->  [0, side, side, 0, 0, main]
-            West ->   [0, main, 0, side, 0, side]
-            East ->   [0, 0, main, side, 0, side]
-            South ->  [0, side, side, main, 0, 0]
+        | isTerminal (state !#! coords) = [0, 0, 0, 0, 0, 0]
+        | state !#! coords == HasGold = case act of
+            North  ->  [0, side, side, 0, 0, main]
+            West   ->   [0, main, 0, side, 0, side]
+            East   ->   [0, 0, main, side, 0, side]
+            South  ->  [0, side, side, main, 0, 0]
             Pickup -> [0, 0, 0, 0, 1, 0]
-        | (act == North) = let x = [if withinBounds zIn (row - 1) col then main else 0,
+        | act == North = let x = [if withinBounds zIn (row - 1) col then main else 0,
                                     if withinBounds zIn row (col - 1) then side else 0,
                                     if withinBounds zIn row (col + 1) then side else 0,
                                     0,
                                     0,
                                     1 - (sum . init) x] in x
-        | (act == West)  = let x = [if withinBounds zIn (row - 1) col then side else 0,
+        | act == West  = let x = [if withinBounds zIn (row - 1) col then side else 0,
                                     if withinBounds zIn row (col - 1) then main else 0,
                                     0,
                                     if withinBounds zIn (row + 1) col then side else 0,
                                     0,
                                     1 - (sum . init) x] in x
-        | (act == East)  = let x = [if withinBounds zIn (row - 1) col then side else 0,
+        | act == East  = let x = [if withinBounds zIn (row - 1) col then side else 0,
                                     0,
                                     if withinBounds zIn row (col + 1) then main else 0,
                                     if withinBounds zIn (row + 1) col then side else 0,
                                     0,
                                     1 - (sum . init) x] in x
-        | (act == South) = let x = [0,
+        | act == South = let x = [0,
                                     if withinBounds zIn row (col - 1) then side else 0,
                                     if withinBounds zIn row (col + 1) then side else 0,
                                     if withinBounds zIn (row + 1) col then main else 0,
                                     0,
                                     1 - (sum . init) x] in x
-        | (act == Pickup) = [0, 0, 0, 0, 1, 0]
+        | act == Pickup = [0, 0, 0, 0, 1, 0]
         where
-            zIn = coords !! 0
+            zIn = head coords
             row = coords !! 1
             col = coords !! 2
             isTerminal state = case state of
                 Terminal _ -> True
-                _ -> False
-            withinBounds zIn row col = ((row >= 0) && (row < (length $ state !! zIn)) && (col >= 0) && (col < (length (state !! zIn !! row)))) -- && (state !! zIn !! row !! col /= (Usable False)))
+                _          -> False
+            withinBounds zIn row col = row >= 0 && row < length (state !! zIn) && col >= 0 && col < length (state !! zIn !! row) -- && (state !! zIn !! row !! col /= (Usable False)))
             main = 0.8
             side = 0.1
 
 wumpusReward :: WumpusPanel -> Double
 wumpusReward panel = case panel of
-                Open -> stepCost
+                Open         -> stepCost
                 (Terminal x) -> x
-                (Pit y) -> y + stepCost
-                _ -> stepCost
+                (Pit y)      -> y + stepCost
+                _            -> stepCost
                 where
-                    stepCost = (-0.04)
+                    stepCost = negate 0.04
+
 
 wumpusMaze = MDP wumpusWorld wumpusActions wumpusAccessor wumpusUtils wumpusTransition wumpusReward
