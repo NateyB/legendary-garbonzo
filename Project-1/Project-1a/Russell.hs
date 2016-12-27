@@ -1,11 +1,16 @@
 module Russell where
 import           MDPs
-
+------------------------------ Russell 3x4 World -------------------------------
 data RussellAction = North
                | West
                | East
                | South
                deriving (Eq, Show);
+
+data RussellPanel = Usable Bool
+              | Terminal Double
+              deriving (Eq, Show);
+
 
 displayAction :: RussellAction -> String
 displayAction North = "^"
@@ -13,24 +18,19 @@ displayAction West  = "<"
 displayAction East  = ">"
 displayAction South = "v"
 
----------------------------------------- Russell 3x4 World ---------------------------------------------
-data RussellPanel = Usable Bool
-               | Terminal Double
-               deriving (Eq, Show);
-
-russellWorld :: NDimensionalGrid RussellPanel
-russellWorld = NDimensionalGrid [
-           OneDimensionalGrid [Usable True, Usable True, Usable True, Terminal 1.0],
-           OneDimensionalGrid [Usable True, Usable False, Usable True, Terminal (-1.0)],
-           OneDimensionalGrid [Usable True, Usable True, Usable True, Usable True]{-,
-           OneDimensionalGrid [Usable True, Usable True, Usable True, Usable True] -- TODO: This last line must be deleted-}
-       ]
-
 doesExist :: NDimensionalGrid RussellPanel -> [Coord] -> Bool
 doesExist (OneDimensionalGrid items) [column] = 0 <= column && column < length items && items !! column /= Usable False
 doesExist (NDimensionalGrid items) [row, column] = 0 <= row && row < length items && doesExist (items !! row) [column]
 doesExist _ _ = error "Dimensionality mismatch in existence check in RussellWorld"
 
+
+-------------------------- MDP Component Definitions ---------------------------
+russellWorld :: NDimensionalGrid RussellPanel
+russellWorld = NDimensionalGrid [
+           OneDimensionalGrid [Usable True, Usable True, Usable True, Terminal 1.0],
+           OneDimensionalGrid [Usable True, Usable False, Usable True, Terminal (-1.0)],
+           OneDimensionalGrid [Usable True, Usable True, Usable True, Usable True]
+       ]
 
 russellActions :: NDimensionalGrid RussellPanel -> [Coord] -> [RussellAction]
 russellActions state [row, col] = (canNorth . canWest . canEast . canSouth) []
@@ -44,29 +44,34 @@ russellTransition :: NDimensionalGrid RussellPanel -> RussellAction -> [Coord] -
 russellTransition state act [row, col]
        | state !#! [row,col] /= Usable True = replicate 5 ([0,0], 0)
 
-       | act == North = let x = [if doesExist state [row - 1, col] then ([row - 1, col], main) else ([0, 0], 0),
-                                 if doesExist state [row, col - 1] then ([row, col - 1], side) else ([0, 0], 0),
-                                 if doesExist state [row, col + 1]then ([row, col + 1], side) else ([0, 0], 0),
+       | act == North = let x = [guardMove [row - 1, col] main,
+                                 guardMove [row, col - 1] side,
+                                 guardMove [row, col + 1] side,
                                  ([0, 0], 0),
-                                 ([row, col], 1 - (sum . init . fmap snd) x)] in x
+                                 ([row, col], distRemainder x)] in x
 
-       | act == West  = let x = [if doesExist state [row - 1, col] then ([row - 1, col], side) else ([0, 0], 0),
-                                   if doesExist state [row, col - 1] then ([row, col - 1], main) else ([0, 0], 0),
+       | act == West  = let x = [guardMove [row - 1, col] side,
+                                   guardMove [row, col - 1] main,
                                    ([0,0], 0),
-                                   if doesExist state [row + 1, col] then ([row + 1, col], side) else ([0, 0], 0),
-                                   ([row, col], 1 - (sum . init . fmap snd) x)] in x
+                                   guardMove [row + 1, col] side,
+                                   ([row, col], distRemainder x)] in x
 
-       | act == East  = let x = [if doesExist state [row - 1, col] then ([row - 1, col], side) else ([0, 0], 0),
+       | act == East  = let x = [guardMove [row - 1, col] side,
                                    ([0,0], 0),
-                                   if doesExist state [row, col + 1] then ([row, col + 1], main) else ([0, 0], 0),
-                                   if doesExist state [row + 1, col] then ([row + 1, col], side) else ([0, 0], 0),
-                                   ([row, col], 1 - (sum . init . fmap snd) x)] in x
+                                   guardMove [row, col + 1] main,
+                                   guardMove [row + 1, col] side,
+                                   ([row, col], distRemainder x)] in x
        | act == South = let x = [([0,0], 0),
-                                   if doesExist state [row, col - 1] then ([row, col - 1], side) else ([0, 0], 0),
-                                   if doesExist state [row, col + 1] then ([row, col + 1], side) else ([0, 0], 0),
-                                   if doesExist state [row + 1, col] then ([row + 1, col], main) else ([0, 0], 0),
-                                   ([row, col], 1 - (sum . init . fmap snd) x)] in x
+                                   guardMove [row, col - 1] side,
+                                   guardMove [row, col + 1] side,
+                                   guardMove [row + 1, col] main,
+                                   ([row, col], distRemainder x)] in x
        where
+           guardMove :: [Coord] -> Double -> STP
+           guardMove coords val
+                | doesExist state coords = (coords, val)
+                | otherwise = ([0, 0], 0)
+           distRemainder dist = 1 - (sum . init . fmap snd) dist
            main = 0.8
            side = 0.1
 

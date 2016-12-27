@@ -20,7 +20,10 @@ instance Functor NDimensionalGrid where
 (!#!) :: NDimensionalGrid a -> [Coord] -> a
 (OneDimensionalGrid items) !#! [i] = items !! i
 (NDimensionalGrid items) !#! (i:is) = (items !! i) !#! is
-_ !#! _ = error "Number of coordinates does not match grid dimensionality."
+(OneDimensionalGrid items) !#! b = error $ "Attempt to pass " ++ show (length b)
+    ++ " indices to a single-dimensional grid."
+(NDimensionalGrid items) !#! b = error $ "Attempt to pass " ++ show (length b)
+    ++ " indices to an n-dimensional grid."
 
 {-
 MDP is a set of states, actions in those states (here actions are static),
@@ -49,6 +52,7 @@ argmax f (q:qs)
         | null qs = q
         | f q < f (head qs) = argmax f qs
         | otherwise = argmax f (q : tail qs)
+argmax _ [] = error "Empty list given to argmax function."
 
 -- | This function maps another function that takes coordinates in reverse
 --   order of the grid--that is, least significant coordinate to most
