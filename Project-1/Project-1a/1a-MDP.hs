@@ -18,9 +18,8 @@ showPolicyOutcome valPolicy polPolicy valUtils polUtils
             policyDisplay = showGrid show valPolicy
             showPolicyTail = "\nPolicy iteration final policy: \n" ++ showGrid show polPolicy
 
-
 main :: IO ()
-main = do putStrLn $ showPolicyOutcome finalValPolicy finalPolPolicy finalValUtils finalPolUtils
+main = putStrLn $ showPolicyOutcome finalValPolicy finalPolPolicy finalValUtils finalPolUtils
             where thisMDP@MDP{state = curState, actions = getActions} = russell3x4
                   theseUtils = fmap (const 0) curState
                   polMDPs = iterate policyIteration (thisMDP, theseUtils, generatePolicy thisMDP theseUtils, discount)

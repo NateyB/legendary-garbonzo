@@ -13,15 +13,24 @@ Project 1 dealt with optimal policies for MDPs (Markov Decision Problems).
 ### Project 1a: Value & Policy Iteration
 Project 1a consisted of approximate algorithms for generating optimal
 policies for MDPs, provided the transition model. This project was
-completed in Haskell. It is currently broken.
+completed in Haskell.
+
+Recently, I reworked this project so that the MDP state space could be
+n-dimensional, and reformulated the solving utilities and definition so
+that, to solve an MDP, the user need only specify the state space, the
+state → action mapping, the state → transition → (state, probability)
+mapping, and the state → reward mapping—as it should be. Previously,
+the user needed to specify many more utilities.
 
 #### Value Iteration
 The value iteration algorithm constantly updates the utilities of each
-square until the largest change in utility is less than some
-user-specified threshold.
+square until the largest change in utility is less than or equal to some
+user-specified threshold. Then, a policy is generated from the resultant
+utilities.
 
 #### Policy Iteration
-The policy iteration algorithm chooses a policy and keeps tweaking it until it stabilizes. In our textbook, the algorithm said that when the policy didn't
+The policy iteration algorithm chooses a policy and keeps tweaking it until
+it stabilizes. In our textbook, the algorithm said that when the policy didn't
 change from one timestep to another, then it had converged. I did not, however,
 find this to be true. Frequently, it took many subsequent iterations to
 converge. Ultimately, I defined convergence as an unchanging policy after

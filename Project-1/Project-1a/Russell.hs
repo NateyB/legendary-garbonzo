@@ -33,36 +33,27 @@ russellWorld = NDimensionalGrid [
        ]
 
 russellActions :: NDimensionalGrid RussellPanel -> [Coord] -> [RussellAction]
-russellActions state [row, col] = (canNorth . canWest . canEast . canSouth) []
-    where
-        canEast x | doesExist state [row, col + 1] = East : x | otherwise = x
-        canWest x | doesExist state [row, col - 1] = West : x | otherwise = x
-        canSouth x | doesExist state [row + 1, col] = South : x | otherwise = x
-        canNorth x | doesExist state [row - 1, col] = North : x | otherwise = x
+russellActions state = const [North, West, East, South]
 
 russellTransition :: NDimensionalGrid RussellPanel -> RussellAction -> [Coord] -> [STP]
 russellTransition state act [row, col]
-       | state !#! [row,col] /= Usable True = replicate 5 ([0,0], 0)
+       | state !#! [row,col] /= Usable True = []
 
        | act == North = let x = [guardMove [row - 1, col] main,
                                  guardMove [row, col - 1] side,
                                  guardMove [row, col + 1] side,
-                                 ([0, 0], 0),
                                  ([row, col], distRemainder x)] in x
 
        | act == West  = let x = [guardMove [row - 1, col] side,
                                    guardMove [row, col - 1] main,
-                                   ([0,0], 0),
                                    guardMove [row + 1, col] side,
                                    ([row, col], distRemainder x)] in x
 
        | act == East  = let x = [guardMove [row - 1, col] side,
-                                   ([0,0], 0),
                                    guardMove [row, col + 1] main,
                                    guardMove [row + 1, col] side,
                                    ([row, col], distRemainder x)] in x
-       | act == South = let x = [([0,0], 0),
-                                   guardMove [row, col - 1] side,
+       | act == South = let x = [guardMove [row, col - 1] side,
                                    guardMove [row, col + 1] side,
                                    guardMove [row + 1, col] main,
                                    ([row, col], distRemainder x)] in x
