@@ -63,3 +63,79 @@ mapCoordinates = specialMap []
         specialMap :: [Coord] -> ([Coord] -> b) -> NDimensionalGrid a -> NDimensionalGrid b
         specialMap coords f (OneDimensionalGrid items) = OneDimensionalGrid $ fmap (f . (: coords)) [0..length items - 1]
         specialMap coords f (NDimensionalGrid items) = NDimensionalGrid $ zipWith (\coord item -> specialMap (coord : coords) f item) [0..length items - 1] items
+
+--------------------------------------------------------------------------------
+----------------------- Generally relevant calculations ------------------------
+--------------------------------------------------------------------------------
+-- Generates a policy given utilities
+generatePolicy :: MDP s action -> NDimensionalGrid Double -> NDimensionalGrid action
+generatePolicy mdp@MDP{state = state, actions = actions} utilities = mapCoordinates ((\coords -> argmax (expectedUtility mdp coords utilities) (actions state coords)) . reverse) state
+
+-- Given an MDP with coordinates, calculates the expected utility of the action provided.
+expectedUtility :: MDP s action -> [Coord] -> NDimensionalGrid Double -> action -> Double
+expectedUtility MDP{state = state, transition = transition} place utilities act = sum $ zipWith (*) utils probs
+    where
+        utils = fmap (utilities !#!) coords
+        (coords, probs) = unzip $ transition state act place
+
+--------------------------------------------------------------------------------
+------------------------------ Value Iteration ---------------------------------
+--------------------------------------------------------------------------------
+singleUtilityUpdate :: MDP a action -> NDimensionalGrid Double -> Double -> [Coord] -> Double
+singleUtilityUpdate mdp@MDP{state = state, reward = reward, actions = actions} utils discount coords = stateReward + discount*futureReward
+    where
+        stateReward = reward $ state !#! coords
+        futureReward = maximum $ fmap (expectedUtility mdp coords utils) moves
+        moves = actions state coords
+
+-- Updates the utilities for every tile in the value iteration algorithm
+utilityEvaluation :: MDP a action -> NDimensionalGrid Double -> Double -> NDimensionalGrid Double
+utilityEvaluation mdp utilities discount = mapCoordinates (singleUtilityUpdate mdp utilities discount . reverse) utilities
+
+
+-- Given an MDP, utilities, and discount, this function constructs the next iteration of the same
+utilityIteration :: (MDP a action, NDimensionalGrid Double, Double) -> (MDP a action, NDimensionalGrid Double, Double)
+utilityIteration (mdp, utilities, discount) = (mdp, utilityEvaluation mdp utilities discount, discount)
+
+
+-- Gets the final iteration check
+finishIterationCheck :: [(MDP a action, NDimensionalGrid Double, Double)] -> Double -> (MDP a action, NDimensionalGrid Double, Double)
+finishIterationCheck ((_, util1, discount):xs) epsilon
+    | maxDifference <= epsilon * (1 - discount)/discount = next_step
+    | otherwise = finishIterationCheck xs epsilon
+       where
+           next_step@(_, util2, _) = head xs
+           maxDifference = getMaximum differences
+           differences = mapCoordinates ((\coords -> abs $ (util1 !#! coords) - (util2 !#! coords)) . reverse) util1
+
+           getMaximum :: Ord a => NDimensionalGrid a -> a
+           getMaximum (OneDimensionalGrid items) = maximum items
+           getMaximum (NDimensionalGrid items) = maximum $ fmap getMaximum items
+
+finishIterationCheck [] _ = error "Value iteration could not begin."
+
+--------------------------------------------------------------------------------
+------------------------------ Policy Iteration ---------------------------------
+--------------------------------------------------------------------------------
+-- Updates the utility for a single tile in the policy iteration algorithm
+singlePolicyUpdate :: MDP state action -> [Coord] -> NDimensionalGrid Double -> NDimensionalGrid action -> Double -> Double
+singlePolicyUpdate mdp@MDP{state = state, reward = reward} coords utilities policy discount = stateReward + discount*futureReward
+    where
+        stateReward = reward $ state !#! coords
+        futureReward = expectedUtility mdp coords utilities (policy !#! coords)
+
+-- Updates the utilities for every tile in the policy iteration algorithm
+policyEvaluation :: MDP a action -> NDimensionalGrid Double -> NDimensionalGrid action -> Double -> NDimensionalGrid Double
+policyEvaluation mdp utilities policy discount = mapCoordinates ((\coords -> singlePolicyUpdate mdp coords utilities policy discount) . reverse) utilities
+
+-- Given an MDP, utilities, policy, and discount, this function constructs the next iteration of the same
+policyIteration :: (MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double) -> (MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)
+policyIteration (mdp, utilities, policy, discount) = (mdp, updatedUtilities, generatePolicy mdp updatedUtilities, discount)
+                                                    where updatedUtilities = policyEvaluation mdp utilities policy discount
+
+-- Gets the converged policy
+finishPolicyCheck :: Eq action => [(MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)] -> Int -> Int -> (MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)
+finishPolicyCheck (x:xs) orig num | num == 0 && samePolicy x (head xs) = x
+                                  | num > 0 && samePolicy x (head xs) = finishPolicyCheck xs orig (num - 1)
+                                  | otherwise = finishPolicyCheck xs orig orig
+                                  where samePolicy (_, _, pol1, _) (_, _, pol2, _) = pol1 == pol2

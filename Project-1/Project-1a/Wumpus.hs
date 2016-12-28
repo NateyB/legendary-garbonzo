@@ -1,6 +1,7 @@
 module Wumpus where
 import           MDPs
 
+--------------------------------- Wumpus World ---------------------------------
 data WumpusPanel = Open
                 | Pit Double
                 | HasImmunity
@@ -13,21 +14,25 @@ data WumpusAction = North
                 | East
                 | South
                 | Pickup
-                deriving (Eq, Show);
+                deriving (Eq);
 
-displayAction :: WumpusAction -> String
-displayAction North  = "^"
-displayAction West   = "<"
-displayAction East   = ">"
-displayAction South  = "v"
-displayAction Pickup = "P"
+instance Show WumpusAction where
+    show North  = "^"
+    show West   = "<"
+    show East   = ">"
+    show South  = "v"
+    show Pickup = "P"
 
 doesExist :: NDimensionalGrid WumpusPanel -> [Coord] -> Bool
 doesExist (OneDimensionalGrid items) [column] = 0 <= column && column < length items
 doesExist (NDimensionalGrid items) (row:rows) = 0 <= row && row < length items && doesExist (items !! row) rows
 doesExist _ _ = error "Dimensionality mismatch in existence check in WumpusWorld"
 
------------------------------------------- Wumpus World ------------------------------------------------
+{-
+Executive decrees about the rules of this MDP:
+1) Pickup can occur anywhere, but only changes anything in the HasGold square.
+2) Immunity is picked up automatically.
+-}
 
 wumpusWorld :: NDimensionalGrid WumpusPanel
 wumpusWorld = let {pit1 = Pit (0.95*cOD); pit2 = Pit (0.15*cOD);
@@ -70,47 +75,6 @@ wumpusActions state [z, row, col] = (canNorth . canWest . canEast . canSouth) [P
         canSouth x | doesExist state [z, row + 1, col] = South : x | otherwise = x
         canNorth x | doesExist state [z, row - 1, col] = North : x | otherwise = x
 
--- -- Will multiply vector: Utility * Probability to get expected utility
--- wumpusUtils :: [[[WumpusPanel]]] -> [Int] -> [[[Double]]] -> [Double]
--- wumpusUtils state coords utils = case (state !! zIn !! row !! col) of
---         Terminal _ -> [0, 0, 0, 0, 0, 0]
---         HasGold -> [0,
---                     utils !! zIn !! row !! (col - 1),
---                     utils !! zIn !! row !! (col + 1),
---                     utils !! zIn !! (row + 1) !! col,
---                     utils !! (zIn + 1) !! row !! col,
---                     utils !! zIn !! row !! col]
---         HasImmunity -> [0,
---                         utils !! (zIn + 2) !! row !! (col - 1),
---                         utils !! (zIn + 2) !! row !! (col + 1),
---                         utils !! (zIn + 2) !! (row + 1) !! col,
---                         utils !! (zIn + 2) !! row !! col,
---                         utils !! (zIn + 2) !! row !! col]
---         Pit x -> fmap (* (1 - abs x)) [if withinBounds zIn (row - 1) col then utils !! zIn !! (row - 1) !! col else 0,
---                                   if withinBounds zIn row (col - 1) then utils !! zIn !! row !! (col - 1) else 0,
---                                   if withinBounds zIn row (col + 1) then utils !! zIn !! row !! (col + 1) else 0,
---                                   if withinBounds zIn (row + 1) col then utils !! zIn !! (row + 1) !! col else 0,
---                                   utils !! zIn !! row !! col,
---                                   utils !! zIn !! row !! col]
---         _ -> [      if withinBounds zIn (row - 1) col then utils !! zIn !! (row - 1) !! col else 0,
---                     if withinBounds zIn row (col - 1) then utils !! zIn !! row !! (col - 1) else 0,
---                     if withinBounds zIn row (col + 1) then utils !! zIn !! row !! (col + 1) else 0,
---                     if withinBounds zIn (row + 1) col then utils !! zIn !! (row + 1) !! col else 0,
---                     utils !! zIn !! row !! col,
---                     utils !! zIn !! row !! col]
---         where
---             zIn = head coords
---             row = coords !! 1
---             col = coords !! 2
---             withinBounds zIn row col = row >= 0 && row < length (state !! zIn) && col >= 0 && col < length (state !! zIn !! row) -- && (state !! zIn !! row !! col /= (Usable False)))
-{-
-Executive decrees about the rules of this MDP:
-1) Pickup can occur anywhere, but only does anything in the HasGold square.
-2) Immunity is picked up automatically.
--}
-
-
--- Vector of the possible transition probabilities
 wumpusTransition :: NDimensionalGrid WumpusPanel -> WumpusAction -> [Coord] -> [STP]
 wumpusTransition state act coords@[zIn, row, col]
         | isTerminal (state !#! coords) = replicate 6 ([0, 0, 0], 0)

@@ -1,22 +1,22 @@
 module Russell where
 import           MDPs
 ------------------------------ Russell 3x4 World -------------------------------
-data RussellAction = North
-               | West
-               | East
-               | South
-               deriving (Eq, Show);
-
 data RussellPanel = Usable Bool
               | Terminal Double
               deriving (Eq, Show);
 
+data RussellAction = North
+               | West
+               | East
+               | South
+               deriving (Eq);
 
-displayAction :: RussellAction -> String
-displayAction North = "^"
-displayAction West  = "<"
-displayAction East  = ">"
-displayAction South = "v"
+instance Show RussellAction where
+    show North = "^"
+    show West  = "<"
+    show East  = ">"
+    show South = "v"
+
 
 doesExist :: NDimensionalGrid RussellPanel -> [Coord] -> Bool
 doesExist (OneDimensionalGrid items) [column] = 0 <= column && column < length items && items !! column /= Usable False

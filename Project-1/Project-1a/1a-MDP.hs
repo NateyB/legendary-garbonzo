@@ -1,144 +1,31 @@
 import           MDPs
+import           Russell
 import           Wumpus
-{-
-TODO:
-Rework the example MDPs to meet the constraints placed by their redefinition
-Rework policy evaluation
--}
-
--- wumpusSamplePolicy = NDimensionalGrid [
---         NDimensionalGrid [
---             OneDimensionalGrid [West, South, South, North],
---             OneDimensionalGrid [West, North, East, South],
---             OneDimensionalGrid [South, West, East, South],
---             OneDimensionalGrid [West, North, West, West]
---         ],
---
---         NDimensionalGrid [
---             OneDimensionalGrid [West, North, North, East],
---             OneDimensionalGrid [West, East, East, East],
---             OneDimensionalGrid [West, West, North, South],
---             OneDimensionalGrid [South, East, East, West]
---         ],
---
---         NDimensionalGrid [
---             OneDimensionalGrid [South, West, South, South],
---             OneDimensionalGrid [East, South, South, North],
---             OneDimensionalGrid [North, East, West, North],
---             OneDimensionalGrid [East, South, West, East]
---         ],
---
---         NDimensionalGrid [
---             OneDimensionalGrid [East, West, East, West],
---             OneDimensionalGrid [North, North, East, North],
---             OneDimensionalGrid [North, South, North, South],
---             OneDimensionalGrid [North, East, West, North]]
---         ] :: NDimensionalGrid WumpusAction
-
--- russellSamplePolicy = NDimensionalGrid [
---         OneDimensionalGrid [North, East, East, North],
---         OneDimensionalGrid [North, West, West, North],
---         OneDimensionalGrid [North, West, West, South]
---         ] :: NDimensionalGrid RussellAction
-
--- Generates a policy given utilities
-generatePolicy :: MDP a action -> NDimensionalGrid Double -> NDimensionalGrid action
-generatePolicy mdp@MDP{state = state, actions = actions} utilities = mapCoordinates ((\coords -> argmax (expectedUtility mdp coords utilities) (actions state coords)) . reverse) state
-
---------------------------------------------------------------------------------
------------------------------- Value Iteration ---------------------------------
---------------------------------------------------------------------------------
--- Given an MDP with coordinates, calculates the expected utility of the action provided.
-expectedUtility :: MDP s action -> [Coord] -> NDimensionalGrid Double -> action -> Double
-expectedUtility MDP{state = state, transition = transition} place utilities act = sum $ zipWith (*) utils probs
-    where
-        utils = fmap (utilities !#!) coords
-        (coords, probs) = unzip $ transition state act place
-
-singleUtilityUpdate :: MDP a action -> NDimensionalGrid Double -> Double -> [Coord] -> Double
-singleUtilityUpdate mdp@MDP{state = state, reward = reward, actions = actions} utils discount coords = stateReward + discount*futureReward
-    where
-        stateReward = reward $ state !#! coords
-        futureReward = maximum $ fmap (expectedUtility mdp coords utils) moves
-        moves = actions state coords
-
--- Updates the utilities for every tile in the value iteration algorithm
-utilityEvaluation :: MDP a action -> NDimensionalGrid Double -> Double -> NDimensionalGrid Double
-utilityEvaluation mdp utilities discount = mapCoordinates (singleUtilityUpdate mdp utilities discount . reverse) utilities
-
-
--- Given an MDP, utilities, and discount, this function constructs the next iteration of the same
-utilityIteration :: (MDP a action, NDimensionalGrid Double, Double) -> (MDP a action, NDimensionalGrid Double, Double)
-utilityIteration (mdp, utilities, discount) = (mdp, utilityEvaluation mdp utilities discount, discount)
-
-
--- Gets the final iteration check
-finishIterationCheck :: [(MDP a action, NDimensionalGrid Double, Double)] -> Double -> (MDP a action, NDimensionalGrid Double, Double)
-finishIterationCheck ((_, util1, discount):xs) epsilon
-    | maxDifference <= epsilon * (1 - discount)/discount = next_step
-    | otherwise = finishIterationCheck xs epsilon
-       where
-           next_step@(_, util2, _) = head xs
-           maxDifference = getMaximum differences
-           differences = mapCoordinates ((\coords -> abs $ (util1 !#! coords) - (util2 !#! coords)) . reverse) util1
-
-           getMaximum :: Ord a => NDimensionalGrid a -> a
-           getMaximum (OneDimensionalGrid items) = maximum items
-           getMaximum (NDimensionalGrid items) = maximum $ fmap getMaximum items
-
-finishIterationCheck [] _ = error "Value iteration could not begin."
-
---------------------------------------------------------------------------------
------------------------------- Policy Iteration ---------------------------------
---------------------------------------------------------------------------------
-
--- -- Updates the utilities for every tile in the policy iteration algorithm
--- policyEvaluation :: MDP a action -> [[[Double]]] -> [[[action]]] -> Double -> [[[Double]]]
--- -- (map (\q -> zipWith (+) [0..((length q) - 1)] q) (map (\x -> replicate (length (q !! x)) x) [0..((length q - 1))]))
--- policyEvaluation mdp@(MDP state acts trans rews acc getUtils) utilities policy discount = mapToAllWithRowColZ (\z col row -> singlePolicyUpdate mdp [z, row, col] utilities policy discount) (replicate (length utilities) (replicate (length $ head utilities) [0..((length . head $ head utilities) - 1)]))
-
--- -- Updates the utility for a single tile in the policy iteration algorithm
--- singlePolicyUpdate :: MDP a action -> [Int] -> [[[Double]]] -> [[[action]]] -> Double -> Double
--- singlePolicyUpdate mdp@(MDP state acts trans rews acc getUtils) coords utilities policy discount = rews acc state coords + discount * expectedUtility mdp coords utilities policy !! head coords !! (coords !! 1) !! (coords !! 2)
-
--- -- Given an MDP, utilities, policy, and discount, this function constructs the next iteration of the same
--- policyIteration :: (MDP a action, [[[Double]]], [[[action]]], Double) -> (MDP a action, [[[Double]]], [[[action]]], Double)
--- policyIteration (mdp@(MDP state acts trans rews acc getUtils), utilities, policy, discount) = (mdp, updatedUtilities, generatePolicy mdp updatedUtilities discount, discount)
---                                                     where updatedUtilities = policyEvaluation mdp utilities policy discount
-
--- -- Gets the converged policy
--- finishPolicyCheck :: Eq action => [(MDP a action, [[[Double]]], [[[action]]], Double)] -> Int -> Int -> (MDP a action, [[[Double]]], [[[action]]], Double)
--- finishPolicyCheck (x:xs) orig num | num == 0 && samePolicy x (head xs) = x
---                                   | num > 0 && samePolicy x (head xs) = finishPolicyCheck xs orig (num - 1)
---                                   | otherwise = finishPolicyCheck xs orig orig
---                                   where samePolicy (a, b, pol1, c) (d, e, pol2, f) = pol1 == pol2
 
 --------------------------------------------------------------------------------------------------------
 -------------------------------------------- Main Program ----------------------------------------------
 --------------------------------------------------------------------------------------------------------
+showPolicyOutcome :: Show a => Eq a => NDimensionalGrid a -> NDimensionalGrid a -> NDimensionalGrid Double -> NDimensionalGrid Double -> String
+showPolicyOutcome valPolicy polPolicy valUtils polUtils
+    | valPolicy /= polPolicy = pUPreface ++ pUDisplay ++ showUtilitiesTail ++ policyPreface ++ policyDisplay ++ showPolicyTail
+    | otherwise = showUtilitiesTail ++ showPolicyTail
+        where
+            pUPreface = "\nPolicy iteration utilities: \n"
+            pUDisplay = showGrid show polUtils
+            showUtilitiesTail = "\nValue iteration utilities: \n" ++ showGrid show valUtils
 
-main = do   putStrLn ""
-            -- if finalValPolicy /= finalPolPolicy then do
-            --     putStrLn "Policy iteration utilities: "
-            --     putStrLn $ showGrid ((++ " | ") . show) finalPolUtils
-            -- else
-            --     putStr ""
-            putStrLn "Value iteration utilities: "
-            putStrLn $ showGrid show finalValUtils
-            putStrLn "Value iteration final policy: "
-            putStrLn $ showGrid displayAction finalValPolicy
-            -- if (finalValPolicy /= finalPolPolicy) then do
-                -- putStrLn "Policy final: "
-                -- putStrLn $ showGrid displayAction finalPolPolicy
-            -- else
-            --     putStr ""
+            policyPreface = "\nValue iteration final policy: \n"
+            policyDisplay = showGrid show valPolicy
+            showPolicyTail = "\nPolicy iteration final policy: \n" ++ showGrid show polPolicy
 
-                where thisMDP@MDP{state = curState} = wumpusMaze
-                    --   thisPolicy = wumpusSamplePolicy
-                      theseUtils = fmap (const 0) curState
-                    --   polMDPs = iterate policyIteration (thisMDP, theseUtils, generatePolicy thisMDP theseUtils discount, discount)
-                      valMDPs = iterate utilityIteration (thisMDP, theseUtils, discount)
-                      (finalValMDP, finalValUtils, valDiscount) = finishIterationCheck valMDPs 0
-                      finalValPolicy = generatePolicy finalValMDP finalValUtils
-                    --   (finalPolMDP, finalPolUtils, finalPolPolicy, polDiscount) = finishPolicyCheck polMDPs 5000 5000
-                      discount = 1
+
+main :: IO ()
+main = do putStrLn $ showPolicyOutcome finalValPolicy finalPolPolicy finalValUtils finalPolUtils
+            where thisMDP@MDP{state = curState, actions = getActions} = russell3x4
+                  theseUtils = fmap (const 0) curState
+                  polMDPs = iterate policyIteration (thisMDP, theseUtils, generatePolicy thisMDP theseUtils, discount)
+                  valMDPs = iterate utilityIteration (thisMDP, theseUtils, discount)
+                  (finalValMDP, finalValUtils, _) = finishIterationCheck valMDPs 0
+                  finalValPolicy = generatePolicy finalValMDP finalValUtils
+                  (_, finalPolUtils, finalPolPolicy, _) = finishPolicyCheck polMDPs 25 25
+                  discount = 1
