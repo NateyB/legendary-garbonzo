@@ -138,8 +138,8 @@ finishPolicyCheck :: Eq action => [(MDP a action, NDimensionalGrid Double, NDime
 finishPolicyCheck mdps replication = performWork mdps replication replication
     where
         performWork :: Eq action => [(MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)] -> Int -> Int -> (MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)
-        performWork (x:xs) orig num | num == 0 && samePolicy x (head xs) = x
-                                  | num > 0 && samePolicy x (head xs) = performWork xs orig (num - 1)
+        performWork (x:xs) orig num | num == 1 = x
+                                  | num > 1 && samePolicy x (head xs) = performWork xs orig (num - 1)
                                   | otherwise = performWork xs orig orig
                                   where samePolicy (_, _, pol1, _) (_, _, pol2, _) = pol1 == pol2
 

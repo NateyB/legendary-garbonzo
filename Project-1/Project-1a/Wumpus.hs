@@ -24,9 +24,13 @@ instance Show WumpusAction where
     show Pickup = "P"
 
 doesExist :: NDimensionalGrid WumpusPanel -> [Coord] -> Bool
-doesExist (OneDimensionalGrid items) [column] = 0 <= column && column < length items
-doesExist (NDimensionalGrid items) (row:rows) = 0 <= row && row < length items && doesExist (items !! row) rows
-doesExist _ _ = error "Dimensionality mismatch in existence check in WumpusWorld"
+doesExist (OneDimensionalGrid items) [column] = 0 <= column
+    && column < length items
+
+doesExist (NDimensionalGrid items) (row:rows) = 0 <= row
+    && row < length items && doesExist (items !! row) rows
+
+doesExist _ _ = error "Dimensionality mismatch in WumpusWorld existence check"
 
 {-
 Executive decrees about the rules of this MDP:
@@ -34,6 +38,7 @@ Executive decrees about the rules of this MDP:
 2) Immunity is picked up automatically.
 -}
 
+-------------------------- MDP Component Definitions ---------------------------
 wumpusWorld :: NDimensionalGrid WumpusPanel
 wumpusWorld = let {pit1 = Pit (0.95*cOD); pit2 = Pit (0.15*cOD);
                     pit3 = Pit (0.25*cOD); cOD = (-1.0)} in
@@ -68,50 +73,45 @@ wumpusWorld = let {pit1 = Pit (0.95*cOD); pit2 = Pit (0.15*cOD);
     ]
 
 wumpusActions :: NDimensionalGrid WumpusPanel -> [Coord] -> [WumpusAction]
-wumpusActions state [z, row, col] = (canNorth . canWest . canEast . canSouth) [Pickup]
-    where
-        canEast x | doesExist state [z, row, col + 1] = East : x | otherwise = x
-        canWest x | doesExist state [z, row, col - 1] = West : x | otherwise = x
-        canSouth x | doesExist state [z, row + 1, col] = South : x | otherwise = x
-        canNorth x | doesExist state [z, row - 1, col] = North : x | otherwise = x
+wumpusActions state = const [North, West, East, South, Pickup]
 
-wumpusTransition :: NDimensionalGrid WumpusPanel -> WumpusAction -> [Coord] -> [STP]
+wumpusTransition :: NDimensionalGrid WumpusPanel
+    -> WumpusAction
+    -> [Coord]
+    -> [STP]
 wumpusTransition state act coords@[zIn, row, col]
-        | isTerminal (state !#! coords) = replicate 6 ([0, 0, 0], 0)
-        | state !#! coords == HasImmunity = wumpusTransition state act [zIn + 2, row, col]
-        | act == North = let x = [guardMove [zIn, row - 1, col] main,
-                                    guardMove [zIn, row, col - 1] side,
-                                    guardMove [zIn, row, col + 1] side,
-                                    ([0, 0, 0], 0),
-                                    ([0, 0, 0], 0),
+        | isTerminal (state !#! coords) = []
+
+        | state !#! coords == HasImmunity
+              = wumpusTransition state act [zIn + 2, row, col]
+
+        | act == North = let x = filter guardMove [([zIn, row - 1, col], main),
+                                    ([zIn, row, col - 1], side),
+                                    ([zIn, row, col + 1], side),
                                     (coords, distRemainder x)] in x
-        | act == West  = let x = [guardMove [zIn, row - 1, col] side,
-                                    guardMove [zIn, row, col - 1] main,
-                                    ([0, 0, 0], 0),
-                                    guardMove [zIn, row + 1, col] side,
-                                    ([0, 0, 0], 0),
+
+        | act == West  = let x = filter guardMove [([zIn, row - 1, col], side),
+                                    ([zIn, row, col - 1], main),
+                                    ([zIn, row + 1, col], side),
                                     (coords, distRemainder x)] in x
-        | act == East  = let x = [guardMove [zIn, row - 1, col] side,
-                                    ([0, 0, 0], 0),
-                                    guardMove [zIn, row, col + 1] main,
-                                    guardMove [zIn, row + 1, col] side,
-                                    ([0, 0, 0], 0),
+
+        | act == East  = let x = filter guardMove [([zIn, row - 1, col], side),
+                                    ([zIn, row, col + 1], main),
+                                    ([zIn, row + 1, col], side),
                                     (coords, distRemainder x)] in x
-        | act == South = let x = [([0, 0, 0], 0),
-                                    guardMove [zIn, row, col - 1] side,
-                                    guardMove [zIn, row, col + 1] side,
-                                    guardMove [zIn, row + 1, col] main,
-                                    ([0, 0, 0], 0),
+
+        | act == South = let x = filter guardMove [([zIn, row, col - 1], side),
+                                    ([zIn, row, col + 1], side),
+                                    ([zIn, row + 1, col], main),
                                     (coords, distRemainder x)] in x
-        | act == Pickup && state !#! coords == HasGold = [([0, 0, 0], 0),
-            ([0, 0, 0], 0), ([0, 0, 0], 0), ([0, 0, 0], 0),
-            ([zIn + 1, row, col], 1), ([0, 0, 0], 0)]
-        | act == Pickup = zip (repeat coords) [0, 0, 0, 0, 1.0, 0]
+
+        | act == Pickup && state !#! coords == HasGold
+              = [([zIn + 1, row, col], 1)]
+
+        | act == Pickup = [(coords, 1)]
+
         where
-            guardMove :: [Coord] -> Double -> STP
-            guardMove coords val
-                | doesExist state coords = (coords, val)
-                | otherwise = ([0, 0, 0], 0)
+            guardMove (coords, _) = doesExist state coords
             distRemainder dist = 1 - (sum . init . fmap snd) dist
             isTerminal state = case state of
                Terminal _ -> True

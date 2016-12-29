@@ -1,5 +1,6 @@
 module Russell where
 import           MDPs
+
 ------------------------------ Russell 3x4 World -------------------------------
 data RussellPanel = Usable Bool
               | Terminal Double
@@ -19,49 +20,55 @@ instance Show RussellAction where
 
 
 doesExist :: NDimensionalGrid RussellPanel -> [Coord] -> Bool
-doesExist (OneDimensionalGrid items) [column] = 0 <= column && column < length items && items !! column /= Usable False
-doesExist (NDimensionalGrid items) [row, column] = 0 <= row && row < length items && doesExist (items !! row) [column]
-doesExist _ _ = error "Dimensionality mismatch in existence check in RussellWorld"
+doesExist (OneDimensionalGrid items) [column] = 0 <= column
+    && column < length items && items !! column /= Usable False
+
+doesExist (NDimensionalGrid items) [row, column] = 0 <= row
+    && row < length items && doesExist (items !! row) [column]
+
+doesExist _ _ = error "Dimensionality mismatch in RussellWorld existence check"
 
 
 -------------------------- MDP Component Definitions ---------------------------
 russellWorld :: NDimensionalGrid RussellPanel
-russellWorld = NDimensionalGrid [
-           OneDimensionalGrid [Usable True, Usable True, Usable True, Terminal 1.0],
-           OneDimensionalGrid [Usable True, Usable False, Usable True, Terminal (-1.0)],
-           OneDimensionalGrid [Usable True, Usable True, Usable True, Usable True]
-       ]
+russellWorld = let {open = Usable True; wall = Usable False;
+                    good = Terminal 1.0; dead = Terminal (-1.0)} in
+    NDimensionalGrid [
+        OneDimensionalGrid [open, open, open, good],
+        OneDimensionalGrid [open, wall, open, dead],
+        OneDimensionalGrid [open, open, open, open]
+    ]
 
 russellActions :: NDimensionalGrid RussellPanel -> [Coord] -> [RussellAction]
 russellActions state = const [North, West, East, South]
 
-russellTransition :: NDimensionalGrid RussellPanel -> RussellAction -> [Coord] -> [STP]
+russellTransition :: NDimensionalGrid RussellPanel
+    -> RussellAction
+    -> [Coord]
+    -> [STP]
 russellTransition state act [row, col]
        | state !#! [row,col] /= Usable True = []
 
-       | act == North = let x = [guardMove [row - 1, col] main,
-                                 guardMove [row, col - 1] side,
-                                 guardMove [row, col + 1] side,
+       | act == North = let x = filter guardMove [([row - 1, col], main),
+                                 ([row, col - 1], side),
+                                 ([row, col + 1], side),
                                  ([row, col], distRemainder x)] in x
 
-       | act == West  = let x = [guardMove [row - 1, col] side,
-                                   guardMove [row, col - 1] main,
-                                   guardMove [row + 1, col] side,
+       | act == West  = let x = filter guardMove [([row - 1, col], side),
+                                   ([row, col - 1], main),
+                                   ([row + 1, col], side),
                                    ([row, col], distRemainder x)] in x
 
-       | act == East  = let x = [guardMove [row - 1, col] side,
-                                   guardMove [row, col + 1] main,
-                                   guardMove [row + 1, col] side,
+       | act == East  = let x = filter guardMove [([row - 1, col], side),
+                                   ([row, col + 1], main),
+                                   ([row + 1, col], side),
                                    ([row, col], distRemainder x)] in x
-       | act == South = let x = [guardMove [row, col - 1] side,
-                                   guardMove [row, col + 1] side,
-                                   guardMove [row + 1, col] main,
+       | act == South = let x = filter guardMove [([row, col - 1], side),
+                                    ([row, col + 1], side),
+                                    ([row + 1, col], main),
                                    ([row, col], distRemainder x)] in x
        where
-           guardMove :: [Coord] -> Double -> STP
-           guardMove coords val
-                | doesExist state coords = (coords, val)
-                | otherwise = ([0, 0], 0)
+           guardMove (coords, _) = doesExist state coords
            distRemainder dist = 1 - (sum . init . fmap snd) dist
            main = 0.8
            side = 0.1
