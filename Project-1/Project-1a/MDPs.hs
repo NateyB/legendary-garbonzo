@@ -1,37 +1,38 @@
 module MDPs where
 
--- | A recursive data structure for dealing with arbitrary dimensions
+-- |A recursive data structure for dealing with arbitrary dimensions.
 data NDimensionalGrid object = OneDimensionalGrid [object]
                              | NDimensionalGrid [NDimensionalGrid object]
                              deriving (Show, Eq)
 
--- | Coordinate
-type Coord = Int
-
--- | State transition probability
-type STP = ([Coord], Double)
-
+-- |Applying fmap to an n-dimensional grid applies the function to every
+-- element in the grid
 instance Functor NDimensionalGrid where
     fmap f (OneDimensionalGrid items) = OneDimensionalGrid (fmap f items)
     fmap f (NDimensionalGrid items)   = NDimensionalGrid (fmap (fmap f) items)
 
--- An accessor for the n-dimensional grid that takes in a list of coordinates
+-- |Coordinate—used in this module for specifying locations in the nD grid.
+type Coord = Int
+
+-- |State transition probability tuple: (New state, transition probability)
+type STP = ([Coord], Double)
+
+-- |An accessor for the n-dimensional grid that takes in a list of coordinates
 -- and outputs the element at the specified location.
 (!#!) :: NDimensionalGrid a -> [Coord] -> a
 (OneDimensionalGrid items) !#! [i] = items !! i
 (NDimensionalGrid items) !#! (i:is) = (items !! i) !#! is
-(OneDimensionalGrid items) !#! b = error $ "Attempt to pass " ++ show (length b)
-    ++ " indices to a single-dimensional grid."
-(NDimensionalGrid items) !#! b = error $ "Attempt to pass " ++ show (length b)
-    ++ " indices to an n-dimensional grid."
+(OneDimensionalGrid items) !#! b = error $ concat ["Attempt to pass ",
+    show (length b), " indices to a single-dimensional grid."]
+(NDimensionalGrid items) !#! b = error $ concat ["Attempt to pass ",
+    show (length b), " indices to an n-dimensional grid."]
 
-{-
-MDP is a set of states, actions in those states (here actions are static),
-a transition model, and a reward model. Note that our transition model must
-also take in coordinates.
+{-|
+  MDP is a set of states, actions in those states (here actions are static),
+  a transition model, and a reward model.
 
-Note that this MDP solving utility assumes (and, in fact, requires)
-stationarity in order to reason about state utilities and policies.
+  Note that this MDP solving utility assumes (and, in fact, requires)
+  stationarity in order to reason about state utilities and policies.
 -}
 data MDP stateComponent action = MDP
     {state     :: NDimensionalGrid stateComponent,
@@ -42,7 +43,8 @@ data MDP stateComponent action = MDP
 --------------------------------------------------------------------------------
 ------------------------------- Helper utilities -------------------------------
 --------------------------------------------------------------------------------
- -- | Formats grid of information using the function specified
+-- |Outputs a formatted nD grid, where elements are converted using the
+-- specified function
 showGrid :: (a -> String) -> NDimensionalGrid a -> String
 showGrid f (OneDimensionalGrid items) = ((++ " | ") . f) =<< items
 showGrid f (NDimensionalGrid items)   = ((++ "\n") . showGrid f) =<< items
@@ -55,9 +57,9 @@ argmax f (q:qs)
         | otherwise = argmax f (q : tail qs)
 argmax _ [] = error "Empty list given to argmax function."
 
--- | This function maps another function that takes coordinates in reverse
---   order of the grid--that is, least significant coordinate to most
---   signficant. In a 2D grid this corresponds to [column, row] order.
+-- |This function maps another function that takes coordinates in reverse
+-- order of the grid--that is, least significant coordinate to most
+-- signficant. In a 2D grid this corresponds to [column, row] order.
 mapCoordinates :: ([Coord] -> b) -> NDimensionalGrid a -> NDimensionalGrid b
 mapCoordinates = specialMap []
     where
@@ -75,7 +77,7 @@ mapCoordinates = specialMap []
 --------------------------------------------------------------------------------
 ----------------------- Generally relevant calculations ------------------------
 --------------------------------------------------------------------------------
--- Generates a policy given utilities
+-- |Generates a policy from an MDP and an nD grid of utilities.
 generatePolicy ::
     MDP s action
     -> NDimensionalGrid Double
@@ -86,8 +88,10 @@ generatePolicy mdp@MDP{state = state, actions = actions} utilities
         (actions state coords))
         . reverse) state
 
--- Given an MDP with coordinates, calculates
--- the expected utility of the action provided.
+-- |Given an MDP with coordinates, a grid of utilities, and an action,
+-- calculates the expected utility of the action provided by calculating
+-- the sum of the products of the utilities of the new states and the
+-- probabilities of reaching those states.
 expectedUtility ::
     MDP s action
     -> [Coord]
@@ -103,6 +107,8 @@ expectedUtility MDP{state = state, transition = transition} place utilities act
 --------------------------------------------------------------------------------
 ------------------------------ Value Iteration ---------------------------------
 --------------------------------------------------------------------------------
+-- |Given an MDP, utilities, discount, and a state, updates the utility of that
+-- state according to the reward & expected utility of future actions
 singleUtilityUpdate ::
     MDP a action
     -> NDimensionalGrid Double
@@ -116,7 +122,8 @@ singleUtilityUpdate mdp@MDP{state = state, reward = reward, actions = actions}
         futureReward = maximum $ fmap (expectedUtility mdp coords utils) moves
         moves = actions state coords
 
--- Updates the utilities for every tile in the value iteration algorithm
+-- |Updates the utilities for every tile in the value iteration algorithm
+-- according to the process describes in the singleUtilityUpdate function
 utilityEvaluation ::
     MDP a action
     -> NDimensionalGrid Double
@@ -127,8 +134,8 @@ utilityEvaluation mdp utilities discount =
         . reverse) utilities
 
 
--- Given an MDP, utilities, and discount, this function constructs
--- the next iteration of the same
+-- |Given an MDP, utilities, and discount, this function constructs
+-- the next iteration of the same values
 valueIteration ::
     (MDP a action, NDimensionalGrid Double, Double)
     -> (MDP a action, NDimensionalGrid Double, Double)
@@ -136,7 +143,11 @@ valueIteration (mdp, utilities, discount)
     = (mdp, utilityEvaluation mdp utilities discount, discount)
 
 
--- Gets the final iteration check
+-- |Gets the final iteration check; determines if the maximum change
+-- between any two states is less than or equal to the second argument,
+-- epsilon, *(1 - discount)/discount
+-- If this maximum change does not exceed this threshold, the function
+-- terminates, returning the most recent value.
 finishIterationCheck ::
     [(MDP a action, NDimensionalGrid Double, Double)]
     -> Double
@@ -157,7 +168,8 @@ finishIterationCheck [] _ = error "Value iteration could not begin."
 --------------------------------------------------------------------------------
 ------------------------------ Policy Iteration --------------------------------
 --------------------------------------------------------------------------------
--- Updates the utility for a single tile in the policy iteration algorithm
+-- |Updates the utility for a single tile in the policy iteration algorithm,
+-- according to the expected utility given by the currently prescribed policy
 singlePolicyUpdate ::
     MDP state action
     -> [Coord]
@@ -171,7 +183,8 @@ singlePolicyUpdate mdp@MDP{state = state, reward = reward} coords
         stateReward = reward $ state !#! coords
         futureReward = expectedUtility mdp coords utilities (policy !#! coords)
 
--- Updates the utilities for every tile in the policy iteration algorithm
+-- |Updates the utilities for every tile in the policy iteration algorithm,
+-- according to the method described in the singlePolicyUpdate function above
 policyEvaluation ::
     MDP a action
     -> NDimensionalGrid Double
@@ -182,8 +195,8 @@ policyEvaluation mdp utilities policy discount = mapCoordinates
     ((\coords -> singlePolicyUpdate mdp coords utilities policy discount)
     . reverse) utilities
 
--- Given an MDP, utilities, policy, and discount, this function
--- constructs the next iteration of the same
+-- |Given an MDP, utilities, policy, and discount, this function
+-- constructs the next iteration of the same values
 policyIteration ::
     (MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)
     -> (MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)
@@ -191,7 +204,9 @@ policyIteration (mdp, utilities, policy, discount)
     = (mdp, updatedUtilities, generatePolicy mdp updatedUtilities, discount)
         where updatedUtilities = policyEvaluation mdp utilities policy discount
 
--- Gets the converged policy
+-- |Returns the converged policy, where convergence is defined as a policy
+-- that does not change after replication, the second argument, iterations.
+-- Note that replication must be greater than 0.
 finishPolicyCheck ::
     Eq act =>
     [(MDP a act, NDimensionalGrid Double, NDimensionalGrid act, Double)]
@@ -209,6 +224,10 @@ finishPolicyCheck mdps replication = performWork mdps replication replication
 --------------------------------------------------------------------------------
 ----------------------------- Solving Utilities --------------------------------
 --------------------------------------------------------------------------------
+-- |Given an MDP, a discount factor, and an epsilon threshold, calculates
+-- a policy and a set of final utilities according to the value iteration
+-- algorithm (i.e., repeatedly udpating tile utilities according to the
+-- best possible action that can be taken in those tiles)
 performValueIteration ::
     MDP s a
     -> Double
@@ -222,6 +241,12 @@ performValueIteration mdp@MDP{state = curState} discount epsilon
             (_, finalUtils, _) = finishIterationCheck mdps epsilon
             finalPol = generatePolicy mdp finalUtils
 
+-- |Given an MDP, a discount factor, and a replication threshold, calculates
+-- a policy and a set of utilities according to the policy iteration algorithm
+-- (i.e., repeatedly updating the utilities in the polcy and recalculating
+-- the policy according to those utilities). Note that the replication threshold
+-- represents the number of unchanged policies before the algorithm
+-- has been deemed to converge.
 performPolicyIteration ::
     Eq a =>
     MDP s a

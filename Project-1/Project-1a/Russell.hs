@@ -18,7 +18,7 @@ instance Show RussellAction where
     show East  = ">"
     show South = "v"
 
-
+-- |Checks if the given coordinates are in the grid & traversable
 doesExist :: NDimensionalGrid RussellPanel -> [Coord] -> Bool
 doesExist (OneDimensionalGrid items) [column] = 0 <= column
     && column < length items && items !! column /= Usable False
@@ -72,13 +72,22 @@ russellTransition state act [row, col]
            guardMove (coords, _) = doesExist state coords
            distRemainder dist = 1 - (sum . tail . fmap snd) dist
            main = 0.8
-           side = 0.1
+           side = (1 - main)/2
 
 russellReward :: RussellPanel -> Double
 russellReward (Usable True) = negate 0.04
 russellReward (Terminal x)  = x
 russellReward _             = 0
 
+{-|
+  The russell3x4 MDP is a very simple 3x4 maze with one wall and two terminal
+  states.
+
+  Any action can be taken in any open square, which is to say that
+  trying to move north when there are no traversable tiles to the north
+  will result in your staying put with the same probability that moving north
+  would give you.
+-}
 russell3x4 :: MDP RussellPanel RussellAction
 russell3x4 = MDP {state = russellWorld,
                   actions = russellActions,

@@ -48,4 +48,4 @@ main = putStrLn $ showPolicyOutcome valPolicy polPolicy valUtils polUtils
                 thisMDP = russell3x4
                 discount = 1
                 epsilon = 0
-                replication = 2
+                replication = 25
