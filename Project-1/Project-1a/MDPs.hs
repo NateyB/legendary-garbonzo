@@ -94,8 +94,8 @@ utilityEvaluation mdp utilities discount = mapCoordinates (singleUtilityUpdate m
 
 
 -- Given an MDP, utilities, and discount, this function constructs the next iteration of the same
-utilityIteration :: (MDP a action, NDimensionalGrid Double, Double) -> (MDP a action, NDimensionalGrid Double, Double)
-utilityIteration (mdp, utilities, discount) = (mdp, utilityEvaluation mdp utilities discount, discount)
+valueIteration :: (MDP a action, NDimensionalGrid Double, Double) -> (MDP a action, NDimensionalGrid Double, Double)
+valueIteration (mdp, utilities, discount) = (mdp, utilityEvaluation mdp utilities discount, discount)
 
 
 -- Gets the final iteration check
@@ -115,7 +115,7 @@ finishIterationCheck ((_, util1, discount):xs) epsilon
 finishIterationCheck [] _ = error "Value iteration could not begin."
 
 --------------------------------------------------------------------------------
------------------------------- Policy Iteration ---------------------------------
+------------------------------ Policy Iteration --------------------------------
 --------------------------------------------------------------------------------
 -- Updates the utility for a single tile in the policy iteration algorithm
 singlePolicyUpdate :: MDP state action -> [Coord] -> NDimensionalGrid Double -> NDimensionalGrid action -> Double -> Double
@@ -134,8 +134,29 @@ policyIteration (mdp, utilities, policy, discount) = (mdp, updatedUtilities, gen
                                                     where updatedUtilities = policyEvaluation mdp utilities policy discount
 
 -- Gets the converged policy
-finishPolicyCheck :: Eq action => [(MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)] -> Int -> Int -> (MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)
-finishPolicyCheck (x:xs) orig num | num == 0 && samePolicy x (head xs) = x
-                                  | num > 0 && samePolicy x (head xs) = finishPolicyCheck xs orig (num - 1)
-                                  | otherwise = finishPolicyCheck xs orig orig
+finishPolicyCheck :: Eq action => [(MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)] -> Int -> (MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)
+finishPolicyCheck mdps replication = performWork mdps replication replication
+    where
+        performWork :: Eq action => [(MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)] -> Int -> Int -> (MDP a action, NDimensionalGrid Double, NDimensionalGrid action, Double)
+        performWork (x:xs) orig num | num == 0 && samePolicy x (head xs) = x
+                                  | num > 0 && samePolicy x (head xs) = performWork xs orig (num - 1)
+                                  | otherwise = performWork xs orig orig
                                   where samePolicy (_, _, pol1, _) (_, _, pol2, _) = pol1 == pol2
+
+--------------------------------------------------------------------------------
+----------------------------- Solving Utilities --------------------------------
+--------------------------------------------------------------------------------
+performValueIteration :: MDP s a -> Double -> Double -> (NDimensionalGrid a, NDimensionalGrid Double)
+performValueIteration mdp@MDP{state = curState} discount epsilon = (finalPol, finalUtils)
+    where
+        startUtils = fmap (const 0) curState
+        mdps = iterate valueIteration (mdp, startUtils, discount)
+        (_, finalUtils, _) = finishIterationCheck mdps epsilon
+        finalPol = generatePolicy mdp finalUtils
+
+performPolicyIteration :: Eq a => MDP s a -> Double -> Int -> (NDimensionalGrid a, NDimensionalGrid Double)
+performPolicyIteration mdp@MDP{state = curState, actions = getActions} discount replication = (finalPol, finalUtils)
+    where
+        startUtils = fmap (const 0) curState
+        mdps = iterate policyIteration (mdp, startUtils, generatePolicy mdp startUtils, discount)
+        (_, finalUtils, finalPol, _) = finishPolicyCheck mdps replication

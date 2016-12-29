@@ -7,7 +7,7 @@ import           Wumpus
 --------------------------------------------------------------------------------------------------------
 showPolicyOutcome :: Show a => Eq a => NDimensionalGrid a -> NDimensionalGrid a -> NDimensionalGrid Double -> NDimensionalGrid Double -> String
 showPolicyOutcome valPolicy polPolicy valUtils polUtils
-    | valPolicy /= polPolicy = pUPreface ++ pUDisplay ++ showUtilitiesTail ++ policyPreface ++ policyDisplay ++ showPolicyTail
+    | valPolicy /= polPolicy = concat [pUPreface, pUDisplay, showUtilitiesTail, policyPreface, policyDisplay, showPolicyTail]
     | otherwise = showUtilitiesTail ++ showPolicyTail
         where
             pUPreface = "\nPolicy iteration utilities: \n"
@@ -19,12 +19,10 @@ showPolicyOutcome valPolicy polPolicy valUtils polUtils
             showPolicyTail = "\nPolicy iteration final policy: \n" ++ showGrid show polPolicy
 
 main :: IO ()
-main = putStrLn $ showPolicyOutcome finalValPolicy finalPolPolicy finalValUtils finalPolUtils
-            where thisMDP@MDP{state = curState, actions = getActions} = russell3x4
-                  theseUtils = fmap (const 0) curState
-                  polMDPs = iterate policyIteration (thisMDP, theseUtils, generatePolicy thisMDP theseUtils, discount)
-                  valMDPs = iterate utilityIteration (thisMDP, theseUtils, discount)
-                  (finalValMDP, finalValUtils, _) = finishIterationCheck valMDPs 0
-                  finalValPolicy = generatePolicy finalValMDP finalValUtils
-                  (_, finalPolUtils, finalPolPolicy, _) = finishPolicyCheck polMDPs 25 25
+main = putStrLn $ showPolicyOutcome valPolicy polPolicy valUtils polUtils
+            where thisMDP = russell3x4
+                  (valPolicy, valUtils) = performValueIteration thisMDP discount epsilon
+                  (polPolicy, polUtils) = performPolicyIteration thisMDP discount replication
                   discount = 1
+                  epsilon = 0
+                  replication = 2
