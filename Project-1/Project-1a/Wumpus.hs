@@ -75,7 +75,8 @@ wumpusWorld = let {pit1 = Pit (0.95*cOD); pit2 = Pit (0.15*cOD);
 wumpusActions :: NDimensionalGrid WumpusPanel -> [Coord] -> [WumpusAction]
 wumpusActions state = const [North, West, East, South, Pickup]
 
-wumpusTransition :: NDimensionalGrid WumpusPanel
+wumpusTransition ::
+    NDimensionalGrid WumpusPanel
     -> WumpusAction
     -> [Coord]
     -> [STP]

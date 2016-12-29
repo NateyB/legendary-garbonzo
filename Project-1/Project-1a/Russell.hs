@@ -42,7 +42,8 @@ russellWorld = let {open = Usable True; wall = Usable False;
 russellActions :: NDimensionalGrid RussellPanel -> [Coord] -> [RussellAction]
 russellActions state = const [North, West, East, South]
 
-russellTransition :: NDimensionalGrid RussellPanel
+russellTransition ::
+    NDimensionalGrid RussellPanel
     -> RussellAction
     -> [Coord]
     -> [STP]

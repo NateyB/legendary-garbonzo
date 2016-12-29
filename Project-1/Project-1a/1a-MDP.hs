@@ -12,8 +12,10 @@ import           Wumpus
 -- generates if the two policies are the same. If the policies provided
 -- differ, then it presents both policies and both sets of utilities
 -- that generated them.
-showPolicyOutcome :: Show a => Eq a
-    => NDimensionalGrid a
+showPolicyOutcome ::
+    Show a =>
+    Eq a =>
+    NDimensionalGrid a
     -> NDimensionalGrid a
     -> NDimensionalGrid Double
     -> NDimensionalGrid Double
