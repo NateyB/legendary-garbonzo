@@ -86,25 +86,25 @@ wumpusTransition state act coords@[zIn, row, col]
         | state !#! coords == HasImmunity
               = wumpusTransition state act [zIn + 2, row, col]
 
-        | act == North = let x = filter guardMove [([zIn, row - 1, col], main),
+        | act == North = let x = (coords, distRemainder x) : filter guardMove
+                                    [([zIn, row - 1, col], main),
                                     ([zIn, row, col - 1], side),
-                                    ([zIn, row, col + 1], side),
-                                    (coords, distRemainder x)] in x
+                                    ([zIn, row, col + 1], side)] in x
 
-        | act == West  = let x = filter guardMove [([zIn, row - 1, col], side),
+        | act == West  = let x = (coords, distRemainder x) : filter guardMove
+                                    [([zIn, row - 1, col], side),
                                     ([zIn, row, col - 1], main),
-                                    ([zIn, row + 1, col], side),
-                                    (coords, distRemainder x)] in x
+                                    ([zIn, row + 1, col], side)] in x
 
-        | act == East  = let x = filter guardMove [([zIn, row - 1, col], side),
+        | act == East  = let x = (coords, distRemainder x) : filter guardMove
+                                    [([zIn, row - 1, col], side),
                                     ([zIn, row, col + 1], main),
-                                    ([zIn, row + 1, col], side),
-                                    (coords, distRemainder x)] in x
+                                    ([zIn, row + 1, col], side)] in x
 
-        | act == South = let x = filter guardMove [([zIn, row, col - 1], side),
+        | act == South = let x = (coords, distRemainder x) : filter guardMove
+                                    [([zIn, row, col - 1], side),
                                     ([zIn, row, col + 1], side),
-                                    ([zIn, row + 1, col], main),
-                                    (coords, distRemainder x)] in x
+                                    ([zIn, row + 1, col], main)] in x
 
         | act == Pickup && state !#! coords == HasGold
               = [([zIn + 1, row, col], 1)]
@@ -113,7 +113,7 @@ wumpusTransition state act coords@[zIn, row, col]
 
         where
             guardMove (coords, _) = doesExist state coords
-            distRemainder dist = 1 - (sum . init . fmap snd) dist
+            distRemainder dist = 1 - (sum . tail . fmap snd) dist
             isTerminal state = case state of
                Terminal _ -> True
                _          -> False

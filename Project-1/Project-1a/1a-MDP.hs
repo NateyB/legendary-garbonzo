@@ -1,7 +1,7 @@
 import           MDPs
 -- Import the MDP that you which to solve
--- import           Russell
-import           Wumpus
+import           Russell
+-- import           Wumpus
 
 --------------------------------------------------------------------------------
 --------------------------------- Main Program ---------------------------------
@@ -45,7 +45,7 @@ main = putStrLn $ showPolicyOutcome valPolicy polPolicy valUtils polUtils
                 (polPolicy, polUtils) = performPolicyIteration thisMDP
                     discount replication
 
-                thisMDP = wumpusMaze
+                thisMDP = russell3x4
                 discount = 1
                 epsilon = 0
                 replication = 2

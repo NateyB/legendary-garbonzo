@@ -50,27 +50,27 @@ russellTransition ::
 russellTransition state act [row, col]
        | state !#! [row,col] /= Usable True = []
 
-       | act == North = let x = filter guardMove [([row - 1, col], main),
+       | act == North = let x = ([row, col], distRemainder x) : filter guardMove
+                                    [([row - 1, col], main),
                                  ([row, col - 1], side),
-                                 ([row, col + 1], side),
-                                 ([row, col], distRemainder x)] in x
+                                 ([row, col + 1], side)] in x
 
-       | act == West  = let x = filter guardMove [([row - 1, col], side),
+       | act == West  = let x = ([row, col], distRemainder x) : filter guardMove
+                                    [([row - 1, col], side),
                                    ([row, col - 1], main),
-                                   ([row + 1, col], side),
-                                   ([row, col], distRemainder x)] in x
+                                   ([row + 1, col], side)] in x
 
-       | act == East  = let x = filter guardMove [([row - 1, col], side),
+       | act == East  = let x = ([row, col], distRemainder x) : filter guardMove
+                                    [([row - 1, col], side),
                                    ([row, col + 1], main),
-                                   ([row + 1, col], side),
-                                   ([row, col], distRemainder x)] in x
-       | act == South = let x = filter guardMove [([row, col - 1], side),
+                                   ([row + 1, col], side)] in x
+       | act == South = let x = ([row, col], distRemainder x) : filter guardMove
+                                    [([row, col - 1], side),
                                     ([row, col + 1], side),
-                                    ([row + 1, col], main),
-                                   ([row, col], distRemainder x)] in x
+                                    ([row + 1, col], main)] in x
        where
            guardMove (coords, _) = doesExist state coords
-           distRemainder dist = 1 - (sum . init . fmap snd) dist
+           distRemainder dist = 1 - (sum . tail . fmap snd) dist
            main = 0.8
            side = 0.1
 
