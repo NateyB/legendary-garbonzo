@@ -1,4 +1,15 @@
-module MDPs where
+{-|
+ Module: MDPs
+ Description: A few utilities for defining and solving Markov Decision Problems
+ 
+ This module supplies a couple of out-of-box MDP solving utilities (that do
+ require stationarity). Specifically, defining an MDP using the provided
+ constructors, you can generate a (policy, utility) tuple from either of the
+ defined methods.
+-}
+module MDPs (NDimensionalGrid(OneDimensionalGrid, NDimensionalGrid),
+             Coord, STP, (!#!), MDP(MDP, state, actions, transition, reward),
+             showGrid, performValueIteration, performPolicyIteration)  where
 
 -- |A recursive data structure for dealing with arbitrary dimensions.
 data NDimensionalGrid object = OneDimensionalGrid [object]
