@@ -52,7 +52,7 @@ inuts to determine the optimal policy.
 Tile encoding consists of making a several sets of tiles (known as a tiling)
 that each capture the entirety of the continuous input space. Then,
 a weighted function, theta(x), based off of the corresponding tiles
-(using eligibility traces; think backproopgation) predicts the next action.
+(using eligibility traces; think backpropogation) predicts the next action.
 
 #### Radial Basis
 The difference between radial basis and tile encoding is that, rather
@@ -83,6 +83,32 @@ of the hidden variables in the network, then would change the value and
 see how likely the new value is, given the Markov blanket, repeating this
 procedure.
 
+
 ## Project 3: Dynamic Bayesian Networks & Language
-Project 3 deals with inference in Dynamic Bayesian Networks and language
+Project 3 deals with inference in Dynamic Bayesian Networks (DBNs) and language
 analysis.
+
+### Using a Hidden Markov Model to Analyze a DBN
+I implemented several algorithms to deal with DBNs using hidden Markov models.
+The language that I used for this part was Java.
+The four algorithms were (in no particular order):
+* The simple forward-backward algorithm
+* The Country-Dance algorithm
+* The particle filtering algorithm
+* The fixed-lag smoothing algorithm
+
+### The n-gram model
+The n-gram model I implemented in Lua because of its flexible table structures.
+There were three tasks for the n-gram model to complete:
+* Naïve Bayes text classification
+* Text generation (according to the n-gram frequencies)
+* Perplexity analysis
+
+A couple of side notes:
+One, the n-grams can be either characters or words, depending on user choice.
+Two, the perplexity analysis performed refers to how well the string provided is
+predicted by the n-gram dictionary provided.
+
+## Reverse Pacman
+The final project incorporating DBNs and POMDPs; the git repository is located
+[here](https://github.com/archon-laboratories/reverse-pacman).
