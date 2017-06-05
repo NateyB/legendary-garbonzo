@@ -1,7 +1,7 @@
 {-|
  Module: MDPs
  Description: A few utilities for defining and solving Markov Decision Problems
- 
+
  This module supplies a couple of out-of-box MDP solving utilities (that do
  require stationarity). Specifically, defining an MDP using the provided
  constructors, you can generate a (policy, utility) tuple from either of the
@@ -160,21 +160,19 @@ valueIteration (mdp, utilities, discount)
 -- If this maximum change does not exceed this threshold, the function
 -- terminates, returning the most recent value.
 finishIterationCheck ::
-    [(MDP a action, NDimensionalGrid Double, Double)]
+    (MDP a b, NDimensionalGrid Double, Double)
     -> Double
-    -> (MDP a action, NDimensionalGrid Double, Double)
-finishIterationCheck ((_, util1, discount):xs) epsilon
+    -> (MDP a b, NDimensionalGrid Double, Double)
+finishIterationCheck (mdp, util1, discount) epsilon
     | maxDifference <= epsilon * (1 - discount)/discount = next_step
-    | otherwise = finishIterationCheck xs epsilon
-       where
-           next_step@(_, util2, _) = head xs
-           maxDifference = getMaximum differences
-           differences = mapCoordinates ((\coords -> abs $ (util1 !#! coords)
-               - (util2 !#! coords)) . reverse) util1
-
-           getMaximum (OneDimensionalGrid items) = maximum items
-           getMaximum (NDimensionalGrid items) = maximum $ fmap getMaximum items
-finishIterationCheck [] _ = error "Value iteration could not begin."
+    | otherwise = finishIterationCheck next_step epsilon
+    where
+       next_step@(_, util2, _) = valueIteration (mdp, util1, discount)
+       maxDifference = getMaximum differences
+       differences = mapCoordinates ((\coords -> abs $ (util1 !#! coords)
+           - (util2 !#! coords)) . reverse) util1
+       getMaximum (OneDimensionalGrid items) = maximum items
+       getMaximum (NDimensionalGrid items)   = maximum $ fmap getMaximum items
 
 --------------------------------------------------------------------------------
 ------------------------------ Policy Iteration --------------------------------
@@ -220,16 +218,17 @@ policyIteration (mdp, utilities, policy, discount)
 -- Note that replication must be greater than 0.
 finishPolicyCheck ::
     Eq act =>
-    [(MDP a act, NDimensionalGrid Double, NDimensionalGrid act, Double)]
+    (MDP a act, NDimensionalGrid Double, NDimensionalGrid act, Double)
     -> Int
     -> (MDP a act, NDimensionalGrid Double, NDimensionalGrid act, Double)
-finishPolicyCheck mdps replication = performWork mdps replication replication
+finishPolicyCheck tuple replication = performWork tuple replication replication
     where
-        performWork (x:xs) orig num
-            | num == 1 = x
-            | num > 1 && samePolicy x (head xs) = performWork xs orig (num - 1)
-            | otherwise = performWork xs orig orig
+        performWork group orig num
+            | num == 1 = next
+            | num > 1 && samePolicy group next = performWork next orig (num - 1)
+            | otherwise = performWork next orig orig
                 where
+                    next = policyIteration group
                     samePolicy (_, _, pol1, _) (_, _, pol2, _) = pol1 == pol2
 
 --------------------------------------------------------------------------------
@@ -248,9 +247,11 @@ performValueIteration mdp@MDP{state = curState} discount epsilon
     = (finalPol, finalUtils)
         where
             startUtils = fmap (const 0) curState
-            mdps = iterate valueIteration (mdp, startUtils, discount)
-            (_, finalUtils, _) = finishIterationCheck mdps epsilon
+            startSituation = (mdp, startUtils, discount)
+            (_, finalUtils, _) = finishIterationCheck startSituation epsilon
             finalPol = generatePolicy mdp finalUtils
+
+
 
 -- |Given an MDP, a discount factor, and a replication threshold, calculates
 -- a policy and a set of utilities according to the policy iteration algorithm
@@ -268,6 +269,5 @@ performPolicyIteration mdp@MDP{state = curState, actions = getActions}
     discount replication = (finalPol, finalUtils)
         where
             startUtils = fmap (const 0) curState
-            mdps = iterate policyIteration
-                (mdp, startUtils, generatePolicy mdp startUtils, discount)
-            (_, finalUtils, finalPol, _) = finishPolicyCheck mdps replication
+            tuple = (mdp, startUtils, generatePolicy mdp startUtils, discount)
+            (_, finalUtils, finalPol, _) = finishPolicyCheck tuple replication
